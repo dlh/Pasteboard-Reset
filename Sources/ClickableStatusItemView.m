@@ -40,12 +40,8 @@ MenuDelegate *_menuDelegate;
 
 - (void)drawRect:(NSRect)rect
 {
-    NSImage *image = self.image;
-    if (_useAlternateImage)
-    {
-        image = self.alternateImage;
-        [self.statusItem drawStatusBarBackgroundInRect:rect withHighlight:YES];
-    }
+    NSImage *image = _useAlternateImage ? self.alternateImage : self.image;
+    [self.statusItem drawStatusBarBackgroundInRect:rect withHighlight:_useAlternateImage];
     [image drawInRect:NSMakeRect(0, 0, image.size.width, image.size.height)
              fromRect:NSZeroRect
             operation:NSCompositeSourceOver
