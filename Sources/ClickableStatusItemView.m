@@ -33,18 +33,18 @@ MenuDelegate *_menuDelegate;
         self.target = target;
         self.action = action;
         self.menu = menu;
-        _menu.delegate = _menuDelegate = [[MenuDelegate alloc] initWithViewController:self];
+        self.menu.delegate = _menuDelegate = [[MenuDelegate alloc] initWithViewController:self];
     }
     return self;
 }
 
 - (void)drawRect:(NSRect)rect
 {
-    NSImage *image = _image;
+    NSImage *image = self.image;
     if (_useAlternateImage)
     {
-        image = _alternateImage;
-        [_statusItem drawStatusBarBackgroundInRect:rect withHighlight:YES];
+        image = self.alternateImage;
+        [self.statusItem drawStatusBarBackgroundInRect:rect withHighlight:YES];
     }
     [image drawInRect:NSMakeRect(0, 0, image.size.width, image.size.height)
              fromRect:NSZeroRect
@@ -70,7 +70,7 @@ MenuDelegate *_menuDelegate;
 - (void)rightMouseDown:(NSEvent *)event
 {
     [self setUseAlternateImage:YES];
-    [_statusItem popUpStatusItemMenu:_menu];
+    [self.statusItem popUpStatusItemMenu:self.menu];
 }
 
 - (void)rightMouseUp:(NSEvent *)event
@@ -103,7 +103,7 @@ MenuDelegate *_menuDelegate;
 
 - (void)menuDidClose:(NSMenu *)menu
 {
-    [_view setUseAlternateImage:NO];
+    [self.view setUseAlternateImage:NO];
 }
 
 @end
