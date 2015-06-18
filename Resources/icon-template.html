@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+    <script src="https://raw.githubusercontent.com/jquery-textfill/jquery-textfill/v0.6.0/source/jquery.textfill.min.js"></script>
+    <script>
+        $(function() {
+            $("div").textfill({maxFontPixels: 0});
+        });
+    </script>
+    <style type="text/css" media="screen">
+        @font-face {
+            font-family: "pasteboard-reset";
+            src: url(pasteboard-reset.ttf);
+        }
+        div {
+            border: 1px solid rgba(255, 0, 0, 0.5);
+            text-align: center;
+            font-family: pasteboard-reset;
+        }
+        .icon-16 {
+            width: 16px;
+            height: 16px;
+        }
+        .icon-32 {
+            width: 32px;
+            height: 32px;
+        }
+        .icon-64 {
+            width: 64px;
+            height: 64px;
+        }
+        .icon-128 {
+            width: 128px;
+            height: 128px;
+        }
+        .icon-256 {
+            width: 256px;
+            height: 256px;
+        }
+        .icon-512 {
+            width: 512px;
+            height: 512px;
+        }
+        .icon-1024 {
+            width: 1024px;
+            height: 1024px;
+        }
+    </style>
+</head>
+<body>
+    <h2>Application Icon (16)</h2>
+    <div class="icon-16"><span>A</span></div>
+    <div class="icon-32"><span>A</span></div>
+
+    <h2>Application Icon (32)</h2>
+    <div class="icon-32"><span>A</span></div>
+    <div class="icon-64"><span>A</span></div>
+
+    <h2>Application Icon (128)</h2>
+    <div class="icon-128"><span>A</span></div>
+    <div class="icon-256"><span>A</span></div>
+
+    <h2>Application Icon (256)</h2>
+    <div class="icon-256"><span>A</span></div>
+    <div class="icon-512"><span>A</span></div>
+
+    <h2>Application Icon (512)</h2>
+    <div class="icon-512"><span>A</span></div>
+    <div class="icon-1024"><span><span>A</span></span></div>
+</body>
+</html>
