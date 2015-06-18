@@ -7,15 +7,16 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		9B1F9DA01B320C38002EF7B6 /* pasteboard-reset.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9B1F9D9F1B320C38002EF7B6 /* pasteboard-reset.ttf */; };
 		9B55DE02197C21D400F6539B /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9B55DE01197C21D400F6539B /* Cocoa.framework */; };
 		9B55DE38197C305300F6539B /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9B55DE37197C305300F6539B /* Images.xcassets */; };
 		9B55DE3E197C306B00F6539B /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B55DE3D197C306B00F6539B /* main.m */; };
 		9B55DE44197C307200F6539B /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B55DE42197C307200F6539B /* AppDelegate.m */; };
 		9BD51F7F1987E163009A896D /* en.lproj in Resources */ = {isa = PBXBuildFile; fileRef = 9BD51F7E1987E163009A896D /* en.lproj */; };
-		9BD51F831987F27E009A896D /* ClickableStatusItemView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BD51F821987F27E009A896D /* ClickableStatusItemView.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		9B1F9D9F1B320C38002EF7B6 /* pasteboard-reset.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "pasteboard-reset.ttf"; path = "Resources/pasteboard-reset.ttf"; sourceTree = "<group>"; };
 		9B55DDFE197C21D400F6539B /* Pasteboard Reset.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Pasteboard Reset.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		9B55DE01197C21D400F6539B /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		9B55DE37197C305300F6539B /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = Resources/Images.xcassets; sourceTree = "<group>"; };
@@ -25,10 +26,8 @@
 		9B55DE41197C307200F6539B /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = Sources/AppDelegate.h; sourceTree = "<group>"; };
 		9B55DE42197C307200F6539B /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AppDelegate.m; path = Sources/AppDelegate.m; sourceTree = "<group>"; };
 		9BD51F7E1987E163009A896D /* en.lproj */ = {isa = PBXFileReference; lastKnownFileType = folder; name = en.lproj; path = Resources/en.lproj; sourceTree = "<group>"; };
-		9BD51F811987F27E009A896D /* ClickableStatusItemView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ClickableStatusItemView.h; path = Sources/ClickableStatusItemView.h; sourceTree = "<group>"; };
-		9BD51F821987F27E009A896D /* ClickableStatusItemView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ClickableStatusItemView.m; path = Sources/ClickableStatusItemView.m; sourceTree = "<group>"; };
 		9BD51F8719880AAC009A896D /* README.md */ = {isa = PBXFileReference; lastKnownFileType = text; path = README.md; sourceTree = "<group>"; };
-		9BD51F8819880AB5009A896D /* status-icon-template.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = "status-icon-template.html"; path = "Resources/status-icon-template.html"; sourceTree = "<group>"; };
+		9BD51F8819880AB5009A896D /* icon-template.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = "icon-template.html"; path = "Resources/icon-template.html"; sourceTree = "<group>"; };
 		9BD51F8919880B53009A896D /* LICENSE.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = LICENSE.txt; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -78,8 +77,6 @@
 				9B55DE3F197C307200F6539B /* Info.plist */,
 				9B55DE3D197C306B00F6539B /* main.m */,
 				9B55DE40197C307200F6539B /* Prefix.pch */,
-				9BD51F811987F27E009A896D /* ClickableStatusItemView.h */,
-				9BD51F821987F27E009A896D /* ClickableStatusItemView.m */,
 			);
 			name = Sources;
 			sourceTree = "<group>";
@@ -88,10 +85,11 @@
 			isa = PBXGroup;
 			children = (
 				9BD51F7E1987E163009A896D /* en.lproj */,
+				9BD51F8819880AB5009A896D /* icon-template.html */,
 				9B55DE37197C305300F6539B /* Images.xcassets */,
 				9BD51F8919880B53009A896D /* LICENSE.txt */,
+				9B1F9D9F1B320C38002EF7B6 /* pasteboard-reset.ttf */,
 				9BD51F8719880AAC009A896D /* README.md */,
-				9BD51F8819880AB5009A896D /* status-icon-template.html */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -149,6 +147,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				9B55DE38197C305300F6539B /* Images.xcassets in Resources */,
+				9B1F9DA01B320C38002EF7B6 /* pasteboard-reset.ttf in Resources */,
 				9BD51F7F1987E163009A896D /* en.lproj in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -160,7 +159,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9BD51F831987F27E009A896D /* ClickableStatusItemView.m in Sources */,
 				9B55DE44197C307200F6539B /* AppDelegate.m in Sources */,
 				9B55DE3E197C306B00F6539B /* main.m in Sources */,
 			);

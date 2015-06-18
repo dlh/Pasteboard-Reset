@@ -1,29 +1,43 @@
 // Copyright (c) 2014 DLH
 
 #import "AppDelegate.h"
-#import "ClickableStatusItemView.h"
 
 @implementation AppDelegate
 
 NSStatusItem *_statusItem;
-ClickableStatusItemView *_statusItemView;
 
 - (void)applicationDidFinishLaunching:(NSNotification *)notification
 {
-    _statusItem = [[NSStatusBar systemStatusBar] statusItemWithLength:NSSquareStatusItemLength];
-    _statusItemView = [[ClickableStatusItemView alloc] initWithStatusItem:_statusItem
-                                                                    image:[NSImage imageNamed:@"status-item"]
-                                                           alternateImage:[NSImage imageNamed:@"status-item-alternate"]
-                                                                   target:self
-                                                                   action:@selector(handleClick:)
-                                                                     menu:[self createMenu]];
-    _statusItem.view = _statusItemView;
+    _statusItem = [[NSStatusBar systemStatusBar] statusItemWithLength:NSVariableStatusItemLength];
+    _statusItem.action = @selector(handleAction:);
+    NSDictionary *attributes = @{NSFontAttributeName: [NSFont fontWithName:@"pasteboard-reset" size:15]};
+    _statusItem.button.attributedTitle = [[NSAttributedString alloc] initWithString:@"A" attributes:attributes];
 }
 
-- (void)handleClick:(id)sender
+- (void)handleAction:(id)sender
 {
+    if ([self hasInterestingModifierFlags:[NSEvent modifierFlags]])
+    {
+        [_statusItem popUpStatusItemMenu:[self createMenu]];
+        return;
+    }
+
     // The general pasteboard only holds one item
     [[NSPasteboard generalPasteboard] clearContents];
+}
+
+- (BOOL)hasInterestingModifierFlags:(NSEventModifierFlags)flags
+{
+    switch (flags & NSDeviceIndependentModifierFlagsMask)
+    {
+        case NSShiftKeyMask:
+        case NSControlKeyMask:
+        case NSAlternateKeyMask:
+        case NSCommandKeyMask:
+        case NSFunctionKeyMask:
+            return YES;
+    }
+    return NO;
 }
 
 - (void)quit:(id)sender
