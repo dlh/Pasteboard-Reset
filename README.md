@@ -1,7 +1,7 @@
 Pasteboard Reset
 ================
 
-An OS X menu bar application to clear the pasteboard.
+A macOS menu bar application to clear the pasteboard.
 
 License
 -------
