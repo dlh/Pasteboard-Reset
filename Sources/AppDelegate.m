@@ -2,6 +2,9 @@
 
 #import "AppDelegate.h"
 
+@interface AppDelegate () <NSMenuDelegate>
+@end
+
 @implementation AppDelegate
 
 NSStatusItem *_statusItem;
@@ -18,7 +21,8 @@ NSStatusItem *_statusItem;
 {
     if ([self hasInterestingModifierFlags:NSApp.currentEvent.modifierFlags])
     {
-        [_statusItem popUpStatusItemMenu:[self createMenu]];
+        _statusItem.menu = [self createMenu];
+        [_statusItem.button performClick:sender];
         return;
     }
 
@@ -44,10 +48,16 @@ NSStatusItem *_statusItem;
 - (NSMenu *)createMenu
 {
     NSMenu *menu = [[NSMenu alloc] init];
+    menu.delegate = self;
     [menu addItemWithTitle:[NSString stringWithFormat:NSLocalizedString(@"Quit %@", nil), self.applicationName]
                     action:@selector(quit:)
              keyEquivalent:@""].target = self;
     return menu;
+}
+
+- (void)menuDidClose:(NSMenu *)menu
+{
+    _statusItem.menu = nil;
 }
 
 - (NSString *)applicationName
