@@ -1,7 +1,7 @@
 APP_NAME := Pasteboard Reset
 EXECUTABLE_NAME := $(APP_NAME)
 PRODUCT_BUNDLE_IDENTIFIER := org.gridstats.Pasteboard-Reset
-MACOSX_DEPLOYMENT_TARGET := 10.9
+MACOSX_DEPLOYMENT_TARGET := 11.0
 CONFIGURATION ?= Release
 
 BUILD_DIR := build/$(CONFIGURATION)
@@ -32,8 +32,6 @@ PYTHON := python3
 COMMON_CFLAGS := \
 	-fobjc-arc \
 	-fmodules \
-	-fobjc-abi-version=2 \
-	-fobjc-legacy-dispatch \
 	-fmodules-cache-path=$(CLANG_MODULE_CACHE) \
 	-include Sources/Prefix.pch \
 	-isysroot $(SDKROOT) \

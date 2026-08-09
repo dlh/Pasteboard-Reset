@@ -12,7 +12,7 @@ NSStatusItem *_statusItem;
 - (void)applicationDidFinishLaunching:(NSNotification *)notification
 {
     _statusItem = [[NSStatusBar systemStatusBar] statusItemWithLength:NSVariableStatusItemLength];
-    _statusItem.action = @selector(handleAction:);
+    _statusItem.button.action = @selector(handleAction:);
     NSDictionary *attributes = @{NSFontAttributeName: [NSFont fontWithName:@"pasteboard-reset" size:15]};
     _statusItem.button.attributedTitle = [[NSAttributedString alloc] initWithString:@"A" attributes:attributes];
 }
