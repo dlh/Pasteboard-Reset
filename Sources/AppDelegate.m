@@ -16,7 +16,7 @@ NSStatusItem *_statusItem;
 
 - (void)handleAction:(id)sender
 {
-    if ([self hasInterestingModifierFlags:[NSEvent modifierFlags]])
+    if ([self hasInterestingModifierFlags:NSApp.currentEvent.modifierFlags])
     {
         [_statusItem popUpStatusItemMenu:[self createMenu]];
         return;
@@ -28,16 +28,12 @@ NSStatusItem *_statusItem;
 
 - (BOOL)hasInterestingModifierFlags:(NSEventModifierFlags)flags
 {
-    switch (flags & NSDeviceIndependentModifierFlagsMask)
-    {
-        case NSShiftKeyMask:
-        case NSControlKeyMask:
-        case NSAlternateKeyMask:
-        case NSCommandKeyMask:
-        case NSFunctionKeyMask:
-            return YES;
-    }
-    return NO;
+    NSEventModifierFlags interestingFlags = NSEventModifierFlagShift |
+                                            NSEventModifierFlagControl |
+                                            NSEventModifierFlagOption |
+                                            NSEventModifierFlagCommand |
+                                            NSEventModifierFlagFunction;
+    return (flags & interestingFlags) != 0;
 }
 
 - (void)quit:(id)sender
