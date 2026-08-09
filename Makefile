@@ -3,8 +3,11 @@ EXECUTABLE_NAME := $(APP_NAME)
 PRODUCT_BUNDLE_IDENTIFIER := org.gridstats.Pasteboard-Reset
 MACOSX_DEPLOYMENT_TARGET := 11.0
 CONFIGURATION ?= Release
+SIGN_IDENTITY ?= -
+NOTARY_PROFILE ?=
 
 BUILD_DIR := build/$(CONFIGURATION)
+ARCHIVE := $(BUILD_DIR)/$(APP_NAME).zip
 APP_DIR := $(BUILD_DIR)/$(APP_NAME).app
 CONTENTS_DIR := $(APP_DIR)/Contents
 MACOS_DIR := $(CONTENTS_DIR)/MacOS
@@ -19,6 +22,7 @@ PLIST_STAMP := $(BUILD_DIR)/.plist.stamp
 ICON_STAMP := $(BUILD_DIR)/.icon.stamp
 RESOURCES_STAMP := $(BUILD_DIR)/.resources.stamp
 SIGN_STAMP := $(BUILD_DIR)/.sign.stamp
+SIGN_IDENTITY_STAMP := $(BUILD_DIR)/.sign.identity
 
 SOURCES := Sources/main.m Sources/AppDelegate.m
 INFO_PLIST := Sources/Info.plist
@@ -26,6 +30,8 @@ INFO_PLIST := Sources/Info.plist
 SDKROOT := $(shell xcrun --sdk macosx --show-sdk-path)
 CLANG := xcrun clang
 CODESIGN := codesign
+DITTO := ditto
+NOTARYTOOL := xcrun notarytool
 PLUTIL := plutil
 PYTHON := python3
 
@@ -48,7 +54,7 @@ else
 CONFIGURATION_CFLAGS := $(RELEASE_CFLAGS)
 endif
 
-.PHONY: all debug release prepare-build run sign clean icon pngcrush
+.PHONY: all debug release prepare-build run sign archive notarize staple clean icon pngcrush
 
 all: release
 
@@ -69,7 +75,10 @@ prepare-build:
 		[ ! -f "$(ICNS_FILE)" ] || \
 		[ ! -f "$(RESOURCES_DIR)/pasteboard-reset.ttf" ] || \
 		[ ! -f "$(RESOURCES_DIR)/en.lproj/Localizable.strings" ]; then \
-		rm -f "$(BINARY_STAMP)" "$(PLIST_STAMP)" "$(ICON_STAMP)" "$(RESOURCES_STAMP)" "$(SIGN_STAMP)"; \
+		rm -f "$(BINARY_STAMP)" "$(PLIST_STAMP)" "$(ICON_STAMP)" "$(RESOURCES_STAMP)" "$(SIGN_STAMP)" "$(SIGN_IDENTITY_STAMP)"; \
+	fi
+	@if [ -f "$(SIGN_STAMP)" ] && { [ ! -f "$(SIGN_IDENTITY_STAMP)" ] || [ "$$(cat "$(SIGN_IDENTITY_STAMP)")" != "$(SIGN_IDENTITY)" ]; }; then \
+		rm -f "$(SIGN_STAMP)"; \
 	fi
 
 $(BINARY_STAMP): $(SOURCES) Sources/AppDelegate.h Sources/Prefix.pch
@@ -102,9 +111,22 @@ $(RESOURCES_STAMP): Resources/pasteboard-reset.ttf Resources/en.lproj/Localizabl
 	cp "Resources/en.lproj/Localizable.strings" "$(RESOURCES_DIR)/en.lproj/"
 	@touch "$@"
 
+sign: $(SIGN_STAMP)
+
 $(SIGN_STAMP): $(BINARY_STAMP) $(PLIST_STAMP) $(ICON_STAMP) $(RESOURCES_STAMP)
-	$(CODESIGN) --force --deep --sign - "$(APP_DIR)"
+	$(CODESIGN) --force --options runtime --timestamp --sign "$(SIGN_IDENTITY)" "$(APP_DIR)"
+	@printf '%s\n' "$(SIGN_IDENTITY)" > "$(SIGN_IDENTITY_STAMP)"
 	@touch "$@"
+
+archive: release
+	$(DITTO) -c -k --keepParent "$(APP_DIR)" "$(ARCHIVE)"
+
+notarize: archive
+	@test -n "$(NOTARY_PROFILE)" || (echo "Set NOTARY_PROFILE to a notarytool keychain profile name."; exit 1)
+	$(NOTARYTOOL) submit "$(ARCHIVE)" --keychain-profile "$(NOTARY_PROFILE)" --wait
+
+staple: notarize
+	xcrun stapler staple "$(APP_DIR)"
 
 run: release
 	open "$(APP_DIR)"

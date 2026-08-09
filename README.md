@@ -12,6 +12,22 @@ Build the app from the command line:
 make release
 ```
 
+By default, the app is ad-hoc signed for local use. To sign with a Developer ID
+certificate later, pass the signing identity:
+
+```sh
+make release SIGN_IDENTITY="Developer ID Application: Your Name (TEAMID)"
+```
+
+For distribution outside your own machine, create a notarytool keychain profile,
+then build, archive, notarize, and staple the app:
+
+```sh
+make staple \
+  SIGN_IDENTITY="Developer ID Application: Your Name (TEAMID)" \
+  NOTARY_PROFILE="PasteboardResetNotary"
+```
+
 License
 -------
 
