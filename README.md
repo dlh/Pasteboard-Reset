@@ -3,6 +3,15 @@ Pasteboard Reset
 
 A macOS menu bar application to clear the pasteboard.
 
+Building
+--------
+
+Build the app from the command line:
+
+```sh
+make release
+```
+
 License
 -------
 
