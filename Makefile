@@ -1,6 +1,6 @@
 APP_NAME := Pasteboard Reset
 EXECUTABLE_NAME := $(APP_NAME)
-PRODUCT_BUNDLE_IDENTIFIER := org.gridstats.Pasteboard-Reset
+PRODUCT_BUNDLE_IDENTIFIER := dev.dlh.pasteboard-reset
 MACOSX_DEPLOYMENT_TARGET := 13.0
 CONFIGURATION ?= Release
 SIGN_IDENTITY ?= -
@@ -25,6 +25,7 @@ CLANG_MODULE_CACHE := $(BUILD_DIR)/ModuleCache
 BINARY_STAMP := $(BUILD_DIR)/.binary.stamp
 PLIST_STAMP := $(BUILD_DIR)/.plist.stamp
 PLIST_VERSION_STAMP := $(BUILD_DIR)/.plist.version
+PLIST_SETTINGS_STAMP := $(BUILD_DIR)/.plist.settings
 ICON_STAMP := $(BUILD_DIR)/.icon.stamp
 RESOURCES_STAMP := $(BUILD_DIR)/.resources.stamp
 SIGN_STAMP := $(BUILD_DIR)/.sign.stamp
@@ -82,12 +83,15 @@ prepare-build:
 		[ ! -f "$(ICNS_FILE)" ] || \
 		[ ! -f "$(RESOURCES_DIR)/pasteboard-reset.ttf" ] || \
 		[ ! -f "$(RESOURCES_DIR)/en.lproj/Localizable.strings" ]; then \
-		rm -f "$(BINARY_STAMP)" "$(PLIST_STAMP)" "$(ICON_STAMP)" "$(RESOURCES_STAMP)" "$(SIGN_STAMP)" "$(SIGN_IDENTITY_STAMP)"; \
+		rm -f "$(BINARY_STAMP)" "$(PLIST_STAMP)" "$(PLIST_SETTINGS_STAMP)" "$(ICON_STAMP)" "$(RESOURCES_STAMP)" "$(SIGN_STAMP)" "$(SIGN_IDENTITY_STAMP)"; \
 	fi
 	@if [ -f "$(SIGN_STAMP)" ] && { [ ! -f "$(SIGN_IDENTITY_STAMP)" ] || [ "$$(cat "$(SIGN_IDENTITY_STAMP)")" != "$(SIGN_IDENTITY)" ]; }; then \
 		rm -f "$(SIGN_STAMP)"; \
 	fi
 	@if [ -f "$(PLIST_STAMP)" ] && { [ ! -f "$(PLIST_VERSION_STAMP)" ] || [ "$$(cat "$(PLIST_VERSION_STAMP)")" != "$(VERSION)|$(BUILD_NUMBER)" ]; }; then \
+		rm -f "$(PLIST_STAMP)" "$(SIGN_STAMP)"; \
+	fi
+	@if [ -f "$(PLIST_STAMP)" ] && { [ ! -f "$(PLIST_SETTINGS_STAMP)" ] || [ "$$(cat "$(PLIST_SETTINGS_STAMP)")" != "$(EXECUTABLE_NAME)|$(APP_NAME)|$(PRODUCT_BUNDLE_IDENTIFIER)|$(MACOSX_DEPLOYMENT_TARGET)" ]; }; then \
 		rm -f "$(PLIST_STAMP)" "$(SIGN_STAMP)"; \
 	fi
 
@@ -111,6 +115,7 @@ $(PLIST_STAMP): $(PLIST_DEPS)
 	$(PLUTIL) -replace LSMinimumSystemVersion -string "$(MACOSX_DEPLOYMENT_TARGET)" "$(PROCESSED_INFO_PLIST)"
 	$(PLUTIL) -lint "$(PROCESSED_INFO_PLIST)"
 	@printf '%s|%s\n' "$(VERSION)" "$(BUILD_NUMBER)" > "$(PLIST_VERSION_STAMP)"
+	@printf '%s|%s|%s|%s\n' "$(EXECUTABLE_NAME)" "$(APP_NAME)" "$(PRODUCT_BUNDLE_IDENTIFIER)" "$(MACOSX_DEPLOYMENT_TARGET)" > "$(PLIST_SETTINGS_STAMP)"
 	@touch "$@"
 
 $(ICON_STAMP): $(APPICONSET_DIR)/Contents.json
