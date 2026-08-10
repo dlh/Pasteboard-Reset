@@ -35,6 +35,14 @@ make staple \
   NOTARY_PROFILE="PasteboardResetNotary"
 ```
 
+Builds are not Developer ID signed by default. If macOS blocks a downloaded
+build because it is quarantined, remove the quarantine attribute after you trust
+the app:
+
+```sh
+xattr -dr com.apple.quarantine "Pasteboard Reset.app"
+```
+
 License
 -------
 
