@@ -48,14 +48,14 @@ jobs:
 
       - name: Verify app bundle version
         run: |
-          test "$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' 'build/Release/Pasteboard Reset.app/Contents/Info.plist')" = "${{ steps.version.outputs.version }}"
-          test "$(/usr/libexec/PlistBuddy -c 'Print :CFBundleVersion' 'build/Release/Pasteboard Reset.app/Contents/Info.plist')" = "${{ github.run_number }}"
+          test "$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' 'build/Pasteboard Reset.app/Contents/Info.plist')" = "${{ steps.version.outputs.version }}"
+          test "$(/usr/libexec/PlistBuddy -c 'Print :CFBundleVersion' 'build/Pasteboard Reset.app/Contents/Info.plist')" = "${{ github.run_number }}"
 
       - name: Create release
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          archive="build/Release/Pasteboard Reset-${{ steps.version.outputs.version }}.zip"
+          archive="build/Pasteboard Reset-${{ steps.version.outputs.version }}.zip"
 
           if gh release view "${{ steps.version.outputs.tag }}" >/dev/null 2>&1; then
             gh release upload "${{ steps.version.outputs.tag }}" "${archive}" --clobber
@@ -69,5 +69,5 @@ jobs:
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: Pasteboard Reset ${{ steps.version.outputs.version }}
-          path: build/Release/Pasteboard Reset-${{ steps.version.outputs.version }}.zip
+          path: build/Pasteboard Reset-${{ steps.version.outputs.version }}.zip
           if-no-files-found: error

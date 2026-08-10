@@ -2,7 +2,7 @@ APP_NAME := Pasteboard Reset
 EXECUTABLE_NAME := $(APP_NAME)
 PRODUCT_BUNDLE_IDENTIFIER := dev.dlh.pasteboard-reset
 MACOSX_DEPLOYMENT_TARGET := 13.0
-CONFIGURATION ?= Release
+CONFIGURATION ?= release
 SIGN_IDENTITY ?= -
 NOTARY_PROFILE ?=
 VERSION_FILE := VERSION
@@ -10,7 +10,7 @@ VERSION ?= $(shell sed -n '1p' "$(VERSION_FILE)")
 BUILD_NUMBER ?= $(shell git rev-list --count HEAD 2>/dev/null || printf '1')
 TAG_PREFIX ?= v
 
-BUILD_DIR := build/$(CONFIGURATION)
+BUILD_DIR := build
 ARCHIVE_BASENAME := $(APP_NAME)-$(VERSION)
 ARCHIVE := $(BUILD_DIR)/$(ARCHIVE_BASENAME).zip
 APP_DIR := $(BUILD_DIR)/$(APP_NAME).app
@@ -22,14 +22,15 @@ PROCESSED_INFO_PLIST := $(CONTENTS_DIR)/Info.plist
 APPICONSET_DIR := Resources/Images.xcassets/AppIcon.appiconset
 ICNS_FILE := $(RESOURCES_DIR)/AppIcon.icns
 CLANG_MODULE_CACHE := $(BUILD_DIR)/ModuleCache
-BINARY_STAMP := $(BUILD_DIR)/.binary.stamp
-PLIST_STAMP := $(BUILD_DIR)/.plist.stamp
-PLIST_VERSION_STAMP := $(BUILD_DIR)/.plist.version
-PLIST_SETTINGS_STAMP := $(BUILD_DIR)/.plist.settings
-ICON_STAMP := $(BUILD_DIR)/.icon.stamp
-RESOURCES_STAMP := $(BUILD_DIR)/.resources.stamp
-SIGN_STAMP := $(BUILD_DIR)/.sign.stamp
-SIGN_IDENTITY_STAMP := $(BUILD_DIR)/.sign.identity
+STAMP_BINARY := $(BUILD_DIR)/.binary.stamp
+STAMP_PLIST := $(BUILD_DIR)/.plist.stamp
+STAMP_ICON := $(BUILD_DIR)/.icon.stamp
+STAMP_RESOURCES := $(BUILD_DIR)/.resources.stamp
+STAMP_SIGN := $(BUILD_DIR)/.sign.stamp
+PLIST_VERSION_FILE := $(BUILD_DIR)/.plist.version
+PLIST_SETTINGS_FILE := $(BUILD_DIR)/.plist.settings
+CONFIGURATION_FILE := $(BUILD_DIR)/.configuration
+SIGN_IDENTITY_FILE := $(BUILD_DIR)/.sign.identity
 
 SOURCES := Sources/main.m Sources/AppDelegate.m
 INFO_PLIST := Sources/Info.plist
@@ -56,46 +57,52 @@ COMMON_CFLAGS := \
 DEBUG_CFLAGS := -O0 -g -DDEBUG=1
 RELEASE_CFLAGS := -Os
 
-ifeq ($(CONFIGURATION),Debug)
+ifeq ($(CONFIGURATION),debug)
 CONFIGURATION_CFLAGS := $(DEBUG_CFLAGS)
-else
+else ifeq ($(CONFIGURATION),release)
 CONFIGURATION_CFLAGS := $(RELEASE_CFLAGS)
+else
+$(error CONFIGURATION must be debug or release)
 endif
 
-.PHONY: all debug release prepare-build run sign archive notarize staple release-tag version clean icon pngcrush
+.PHONY: all debug release build prepare-build run sign archive notarize staple release-tag version clean icon pngcrush
 
 all: release
 
 debug:
-	$(MAKE) CONFIGURATION=Debug prepare-build
-	$(MAKE) CONFIGURATION=Debug build
+	$(MAKE) CONFIGURATION=debug build
 
 release:
-	$(MAKE) CONFIGURATION=Release prepare-build
-	$(MAKE) CONFIGURATION=Release build
+	$(MAKE) CONFIGURATION=release build
 
-build: $(SIGN_STAMP)
+build: prepare-build
+	$(MAKE) CONFIGURATION="$(CONFIGURATION)" "$(STAMP_SIGN)"
 
 prepare-build:
+	@mkdir -p "$(BUILD_DIR)"
+	@if [ -f "$(CONFIGURATION_FILE)" ] && [ "$$(cat "$(CONFIGURATION_FILE)")" != "$(CONFIGURATION)" ]; then \
+		rm -f "$(STAMP_BINARY)" "$(STAMP_PLIST)" "$(STAMP_ICON)" "$(STAMP_RESOURCES)" "$(STAMP_SIGN)" "$(PLIST_VERSION_FILE)" "$(PLIST_SETTINGS_FILE)" "$(SIGN_IDENTITY_FILE)"; \
+	fi
+	@printf '%s\n' "$(CONFIGURATION)" > "$(CONFIGURATION_FILE)"
 	@if [ ! -d "$(APP_DIR)" ] || \
 		[ ! -x "$(EXECUTABLE)" ] || \
 		[ ! -f "$(PROCESSED_INFO_PLIST)" ] || \
 		[ ! -f "$(ICNS_FILE)" ] || \
 		[ ! -f "$(RESOURCES_DIR)/pasteboard-reset.ttf" ] || \
 		[ ! -f "$(RESOURCES_DIR)/en.lproj/Localizable.strings" ]; then \
-		rm -f "$(BINARY_STAMP)" "$(PLIST_STAMP)" "$(PLIST_SETTINGS_STAMP)" "$(ICON_STAMP)" "$(RESOURCES_STAMP)" "$(SIGN_STAMP)" "$(SIGN_IDENTITY_STAMP)"; \
+		rm -f "$(STAMP_BINARY)" "$(STAMP_PLIST)" "$(STAMP_ICON)" "$(STAMP_RESOURCES)" "$(STAMP_SIGN)" "$(PLIST_SETTINGS_FILE)" "$(SIGN_IDENTITY_FILE)"; \
 	fi
-	@if [ -f "$(SIGN_STAMP)" ] && { [ ! -f "$(SIGN_IDENTITY_STAMP)" ] || [ "$$(cat "$(SIGN_IDENTITY_STAMP)")" != "$(SIGN_IDENTITY)" ]; }; then \
-		rm -f "$(SIGN_STAMP)"; \
+	@if [ -f "$(STAMP_SIGN)" ] && { [ ! -f "$(SIGN_IDENTITY_FILE)" ] || [ "$$(cat "$(SIGN_IDENTITY_FILE)")" != "$(SIGN_IDENTITY)" ]; }; then \
+		rm -f "$(STAMP_SIGN)"; \
 	fi
-	@if [ -f "$(PLIST_STAMP)" ] && { [ ! -f "$(PLIST_VERSION_STAMP)" ] || [ "$$(cat "$(PLIST_VERSION_STAMP)")" != "$(VERSION)|$(BUILD_NUMBER)" ]; }; then \
-		rm -f "$(PLIST_STAMP)" "$(SIGN_STAMP)"; \
+	@if [ -f "$(STAMP_PLIST)" ] && { [ ! -f "$(PLIST_VERSION_FILE)" ] || [ "$$(cat "$(PLIST_VERSION_FILE)")" != "$(VERSION)|$(BUILD_NUMBER)" ]; }; then \
+		rm -f "$(STAMP_PLIST)" "$(STAMP_SIGN)"; \
 	fi
-	@if [ -f "$(PLIST_STAMP)" ] && { [ ! -f "$(PLIST_SETTINGS_STAMP)" ] || [ "$$(cat "$(PLIST_SETTINGS_STAMP)")" != "$(EXECUTABLE_NAME)|$(APP_NAME)|$(PRODUCT_BUNDLE_IDENTIFIER)|$(MACOSX_DEPLOYMENT_TARGET)" ]; }; then \
-		rm -f "$(PLIST_STAMP)" "$(SIGN_STAMP)"; \
+	@if [ -f "$(STAMP_PLIST)" ] && { [ ! -f "$(PLIST_SETTINGS_FILE)" ] || [ "$$(cat "$(PLIST_SETTINGS_FILE)")" != "$(EXECUTABLE_NAME)|$(APP_NAME)|$(PRODUCT_BUNDLE_IDENTIFIER)|$(MACOSX_DEPLOYMENT_TARGET)" ]; }; then \
+		rm -f "$(STAMP_PLIST)" "$(STAMP_SIGN)"; \
 	fi
 
-$(BINARY_STAMP): $(SOURCES) Sources/AppDelegate.h Sources/Prefix.pch
+$(STAMP_BINARY): $(SOURCES) Sources/AppDelegate.h Sources/Prefix.pch
 	@mkdir -p "$(MACOS_DIR)"
 	$(CLANG) $(COMMON_CFLAGS) $(CONFIGURATION_CFLAGS) \
 		-framework Cocoa \
@@ -104,7 +111,7 @@ $(BINARY_STAMP): $(SOURCES) Sources/AppDelegate.h Sources/Prefix.pch
 		$(SOURCES)
 	@touch "$@"
 
-$(PLIST_STAMP): $(PLIST_DEPS)
+$(STAMP_PLIST): $(PLIST_DEPS)
 	@mkdir -p "$(CONTENTS_DIR)"
 	cp "$(INFO_PLIST)" "$(PROCESSED_INFO_PLIST)"
 	$(PLUTIL) -replace CFBundleExecutable -string "$(EXECUTABLE_NAME)" "$(PROCESSED_INFO_PLIST)"
@@ -114,27 +121,27 @@ $(PLIST_STAMP): $(PLIST_DEPS)
 	$(PLUTIL) -replace CFBundleVersion -string "$(BUILD_NUMBER)" "$(PROCESSED_INFO_PLIST)"
 	$(PLUTIL) -replace LSMinimumSystemVersion -string "$(MACOSX_DEPLOYMENT_TARGET)" "$(PROCESSED_INFO_PLIST)"
 	$(PLUTIL) -lint "$(PROCESSED_INFO_PLIST)"
-	@printf '%s|%s\n' "$(VERSION)" "$(BUILD_NUMBER)" > "$(PLIST_VERSION_STAMP)"
-	@printf '%s|%s|%s|%s\n' "$(EXECUTABLE_NAME)" "$(APP_NAME)" "$(PRODUCT_BUNDLE_IDENTIFIER)" "$(MACOSX_DEPLOYMENT_TARGET)" > "$(PLIST_SETTINGS_STAMP)"
+	@printf '%s|%s\n' "$(VERSION)" "$(BUILD_NUMBER)" > "$(PLIST_VERSION_FILE)"
+	@printf '%s|%s|%s|%s\n' "$(EXECUTABLE_NAME)" "$(APP_NAME)" "$(PRODUCT_BUNDLE_IDENTIFIER)" "$(MACOSX_DEPLOYMENT_TARGET)" > "$(PLIST_SETTINGS_FILE)"
 	@touch "$@"
 
-$(ICON_STAMP): $(APPICONSET_DIR)/Contents.json
+$(STAMP_ICON): $(APPICONSET_DIR)/Contents.json
 	@mkdir -p "$(RESOURCES_DIR)"
 	$(PYTHON) bin/make_icns.py "$(APPICONSET_DIR)" "$(ICNS_FILE)"
 	@touch "$@"
 
-$(RESOURCES_STAMP): Resources/pasteboard-reset.ttf Resources/en.lproj/Localizable.strings
+$(STAMP_RESOURCES): Resources/pasteboard-reset.ttf Resources/en.lproj/Localizable.strings
 	@mkdir -p "$(RESOURCES_DIR)"
 	cp "Resources/pasteboard-reset.ttf" "$(RESOURCES_DIR)/"
 	@mkdir -p "$(RESOURCES_DIR)/en.lproj"
 	cp "Resources/en.lproj/Localizable.strings" "$(RESOURCES_DIR)/en.lproj/"
 	@touch "$@"
 
-sign: $(SIGN_STAMP)
+sign: build
 
-$(SIGN_STAMP): $(BINARY_STAMP) $(PLIST_STAMP) $(ICON_STAMP) $(RESOURCES_STAMP)
+$(STAMP_SIGN): $(STAMP_BINARY) $(STAMP_PLIST) $(STAMP_ICON) $(STAMP_RESOURCES)
 	$(CODESIGN) --force --options runtime --timestamp --sign "$(SIGN_IDENTITY)" "$(APP_DIR)"
-	@printf '%s\n' "$(SIGN_IDENTITY)" > "$(SIGN_IDENTITY_STAMP)"
+	@printf '%s\n' "$(SIGN_IDENTITY)" > "$(SIGN_IDENTITY_FILE)"
 	@touch "$@"
 
 archive: release
@@ -159,7 +166,8 @@ notarize: archive
 staple: notarize
 	xcrun stapler staple "$(APP_DIR)"
 
-run: release
+run:
+	$(MAKE) CONFIGURATION="$(CONFIGURATION)" build
 	"$(EXECUTABLE)"
 
 clean:
