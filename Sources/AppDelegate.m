@@ -45,10 +45,20 @@ NSStatusItem *_statusItem;
     [NSApp terminate:self];
 }
 
+- (void)showAbout:(id)sender
+{
+    [NSApp activateIgnoringOtherApps:YES];
+    [NSApp orderFrontStandardAboutPanel:sender];
+}
+
 - (NSMenu *)createMenu
 {
     NSMenu *menu = [[NSMenu alloc] init];
     menu.delegate = self;
+    [menu addItemWithTitle:[NSString stringWithFormat:NSLocalizedString(@"About %@", nil), self.applicationName]
+                    action:@selector(showAbout:)
+             keyEquivalent:@""].target = self;
+    [menu addItem:[NSMenuItem separatorItem]];
     [menu addItemWithTitle:[NSString stringWithFormat:NSLocalizedString(@"Quit %@", nil), self.applicationName]
                     action:@selector(quit:)
              keyEquivalent:@""].target = self;
