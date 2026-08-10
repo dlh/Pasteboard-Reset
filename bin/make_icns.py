@@ -1,46 +1,39 @@
 #!/usr/bin/env python3
+import argparse
 import struct
-import sys
 from pathlib import Path
 
 
-PNG_SIGNATURE = b"\x89PNG\r\n\x1a\n"
+def make_chunk(chunk_type: bytes, payload: bytes) -> bytes:
+    return chunk_type + struct.pack(">I", len(payload) + 8) + payload
 
 
-def read_png(path):
-    data = path.read_bytes()
-    if not data.startswith(PNG_SIGNATURE):
-        raise ValueError(f"{path} is not a PNG file")
-    return data
+def main() -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("appiconset_dir", type=Path)
+    parser.add_argument("output_path", type=Path)
+    args = parser.parse_args()
 
-
-def main(argv):
-    if len(argv) != 3:
-        print("usage: make_icns.py APPICONSET_DIR OUTPUT_ICNS", file=sys.stderr)
-        return 2
-
-    appiconset_dir = Path(argv[1])
-    output_path = Path(argv[2])
-    entries = [
-        (b"icp4", appiconset_dir / "AppIcon-16.png"),
-        (b"icp5", appiconset_dir / "AppIcon-32.png"),
-        (b"icp6", appiconset_dir / "AppIcon-32@2x.png"),
-        (b"ic07", appiconset_dir / "AppIcon-128.png"),
-        (b"ic08", appiconset_dir / "AppIcon-256.png"),
-        (b"ic09", appiconset_dir / "AppIcon-512.png"),
-        (b"ic10", appiconset_dir / "AppIcon-512@2x.png"),
+    entries: list[tuple[bytes, Path]] = [
+        (b"icp4", args.appiconset_dir / "AppIcon-16.png"),
+        (b"icp5", args.appiconset_dir / "AppIcon-32.png"),
+        (b"icp6", args.appiconset_dir / "AppIcon-32@2x.png"),
+        (b"ic07", args.appiconset_dir / "AppIcon-128.png"),
+        (b"ic08", args.appiconset_dir / "AppIcon-256.png"),
+        (b"ic09", args.appiconset_dir / "AppIcon-512.png"),
+        (b"ic10", args.appiconset_dir / "AppIcon-512@2x.png"),
     ]
 
-    chunks = []
-    for icon_type, path in entries:
-        data = read_png(path)
-        chunks.append(icon_type + struct.pack(">I", len(data) + 8) + data)
-
-    payload = b"".join(chunks)
-    output_path.parent.mkdir(parents=True, exist_ok=True)
-    output_path.write_bytes(b"icns" + struct.pack(">I", len(payload) + 8) + payload)
+    payload = b"".join(
+        [
+            make_chunk(icon_type, path.read_bytes())
+            for icon_type, path in entries
+        ]
+    )
+    args.output_path.parent.mkdir(parents=True, exist_ok=True)
+    args.output_path.write_bytes(make_chunk(b"icns", payload))
     return 0
 
 
 if __name__ == "__main__":
-    raise SystemExit(main(sys.argv))
+    raise SystemExit(main())
