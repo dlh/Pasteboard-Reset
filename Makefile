@@ -1,7 +1,7 @@
 APP_NAME := Pasteboard Reset
 EXECUTABLE_NAME := $(APP_NAME)
 PRODUCT_BUNDLE_IDENTIFIER := org.gridstats.Pasteboard-Reset
-MACOSX_DEPLOYMENT_TARGET := 11.0
+MACOSX_DEPLOYMENT_TARGET := 13.0
 CONFIGURATION ?= Release
 SIGN_IDENTITY ?= -
 NOTARY_PROFILE ?=
@@ -95,6 +95,7 @@ $(BINARY_STAMP): $(SOURCES) Sources/AppDelegate.h Sources/Prefix.pch
 	@mkdir -p "$(MACOS_DIR)"
 	$(CLANG) $(COMMON_CFLAGS) $(CONFIGURATION_CFLAGS) \
 		-framework Cocoa \
+		-framework ServiceManagement \
 		-o "$(EXECUTABLE)" \
 		$(SOURCES)
 	@touch "$@"
