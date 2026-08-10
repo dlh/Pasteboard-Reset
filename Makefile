@@ -5,9 +5,14 @@ MACOSX_DEPLOYMENT_TARGET := 11.0
 CONFIGURATION ?= Release
 SIGN_IDENTITY ?= -
 NOTARY_PROFILE ?=
+VERSION_FILE := VERSION
+VERSION ?= $(shell sed -n '1p' "$(VERSION_FILE)")
+BUILD_NUMBER ?= $(shell git rev-list --count HEAD 2>/dev/null || printf '1')
+TAG_PREFIX ?= v
 
 BUILD_DIR := build/$(CONFIGURATION)
-ARCHIVE := $(BUILD_DIR)/$(APP_NAME).zip
+ARCHIVE_BASENAME := $(APP_NAME)-$(VERSION)
+ARCHIVE := $(BUILD_DIR)/$(ARCHIVE_BASENAME).zip
 APP_DIR := $(BUILD_DIR)/$(APP_NAME).app
 CONTENTS_DIR := $(APP_DIR)/Contents
 MACOS_DIR := $(CONTENTS_DIR)/MacOS
@@ -19,6 +24,7 @@ ICNS_FILE := $(RESOURCES_DIR)/AppIcon.icns
 CLANG_MODULE_CACHE := $(BUILD_DIR)/ModuleCache
 BINARY_STAMP := $(BUILD_DIR)/.binary.stamp
 PLIST_STAMP := $(BUILD_DIR)/.plist.stamp
+PLIST_VERSION_STAMP := $(BUILD_DIR)/.plist.version
 ICON_STAMP := $(BUILD_DIR)/.icon.stamp
 RESOURCES_STAMP := $(BUILD_DIR)/.resources.stamp
 SIGN_STAMP := $(BUILD_DIR)/.sign.stamp
@@ -26,6 +32,7 @@ SIGN_IDENTITY_STAMP := $(BUILD_DIR)/.sign.identity
 
 SOURCES := Sources/main.m Sources/AppDelegate.m
 INFO_PLIST := Sources/Info.plist
+PLIST_DEPS := $(INFO_PLIST) $(VERSION_FILE)
 
 SDKROOT := $(shell xcrun --sdk macosx --show-sdk-path)
 CLANG := xcrun clang
@@ -54,7 +61,7 @@ else
 CONFIGURATION_CFLAGS := $(RELEASE_CFLAGS)
 endif
 
-.PHONY: all debug release prepare-build run sign archive notarize staple clean icon pngcrush
+.PHONY: all debug release prepare-build run sign archive notarize staple release-tag version clean icon pngcrush
 
 all: release
 
@@ -80,6 +87,9 @@ prepare-build:
 	@if [ -f "$(SIGN_STAMP)" ] && { [ ! -f "$(SIGN_IDENTITY_STAMP)" ] || [ "$$(cat "$(SIGN_IDENTITY_STAMP)")" != "$(SIGN_IDENTITY)" ]; }; then \
 		rm -f "$(SIGN_STAMP)"; \
 	fi
+	@if [ -f "$(PLIST_STAMP)" ] && { [ ! -f "$(PLIST_VERSION_STAMP)" ] || [ "$$(cat "$(PLIST_VERSION_STAMP)")" != "$(VERSION)|$(BUILD_NUMBER)" ]; }; then \
+		rm -f "$(PLIST_STAMP)" "$(SIGN_STAMP)"; \
+	fi
 
 $(BINARY_STAMP): $(SOURCES) Sources/AppDelegate.h Sources/Prefix.pch
 	@mkdir -p "$(MACOS_DIR)"
@@ -89,14 +99,17 @@ $(BINARY_STAMP): $(SOURCES) Sources/AppDelegate.h Sources/Prefix.pch
 		$(SOURCES)
 	@touch "$@"
 
-$(PLIST_STAMP): $(INFO_PLIST)
+$(PLIST_STAMP): $(PLIST_DEPS)
 	@mkdir -p "$(CONTENTS_DIR)"
 	cp "$(INFO_PLIST)" "$(PROCESSED_INFO_PLIST)"
 	$(PLUTIL) -replace CFBundleExecutable -string "$(EXECUTABLE_NAME)" "$(PROCESSED_INFO_PLIST)"
 	$(PLUTIL) -replace CFBundleName -string "$(APP_NAME)" "$(PROCESSED_INFO_PLIST)"
 	$(PLUTIL) -replace CFBundleIdentifier -string "$(PRODUCT_BUNDLE_IDENTIFIER)" "$(PROCESSED_INFO_PLIST)"
+	$(PLUTIL) -replace CFBundleShortVersionString -string "$(VERSION)" "$(PROCESSED_INFO_PLIST)"
+	$(PLUTIL) -replace CFBundleVersion -string "$(BUILD_NUMBER)" "$(PROCESSED_INFO_PLIST)"
 	$(PLUTIL) -replace LSMinimumSystemVersion -string "$(MACOSX_DEPLOYMENT_TARGET)" "$(PROCESSED_INFO_PLIST)"
 	$(PLUTIL) -lint "$(PROCESSED_INFO_PLIST)"
+	@printf '%s|%s\n' "$(VERSION)" "$(BUILD_NUMBER)" > "$(PLIST_VERSION_STAMP)"
 	@touch "$@"
 
 $(ICON_STAMP): $(APPICONSET_DIR)/Contents.json
@@ -119,7 +132,19 @@ $(SIGN_STAMP): $(BINARY_STAMP) $(PLIST_STAMP) $(ICON_STAMP) $(RESOURCES_STAMP)
 	@touch "$@"
 
 archive: release
+	@rm -f "$(ARCHIVE)"
 	$(DITTO) -c -k --keepParent "$(APP_DIR)" "$(ARCHIVE)"
+
+release-tag:
+	@test -n "$(VERSION)" || (echo "VERSION is empty."; exit 1)
+	@printf '%s\n' "$(VERSION)" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$$' || (echo "VERSION must use semantic version format, such as 1.2.3."; exit 1)
+	@test "$$(git status --porcelain)" = "" || (echo "Working tree must be clean before tagging."; exit 1)
+	@test -z "$$(git tag --list "$(TAG_PREFIX)$(VERSION)")" || (echo "Tag $(TAG_PREFIX)$(VERSION) already exists."; exit 1)
+	git tag -a "$(TAG_PREFIX)$(VERSION)" -m "Release $(VERSION)"
+	@printf 'Created tag %s%s. Push it with: git push origin %s%s\n' "$(TAG_PREFIX)" "$(VERSION)" "$(TAG_PREFIX)" "$(VERSION)"
+
+version:
+	@printf '%s\n' "$(VERSION)"
 
 notarize: archive
 	@test -n "$(NOTARY_PROFILE)" || (echo "Set NOTARY_PROFILE to a notarytool keychain profile name."; exit 1)
@@ -129,7 +154,7 @@ staple: notarize
 	xcrun stapler staple "$(APP_DIR)"
 
 run: release
-	open "$(APP_DIR)"
+	"$(EXECUTABLE)"
 
 clean:
 	rm -rf build

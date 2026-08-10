@@ -12,6 +12,13 @@ Build the app from the command line:
 make release
 ```
 
+The app version is read from `VERSION`, and the build number defaults to the
+number of commits on the current branch. You can override both values:
+
+```sh
+make release VERSION=1.2.3 BUILD_NUMBER=42
+```
+
 By default, the app is ad-hoc signed for local use. To sign with a Developer ID
 certificate later, pass the signing identity:
 
@@ -35,3 +42,20 @@ This project is released under the MIT license. See LICENSE.txt for more
 information.
 
 Pasteboard Reset's icons are derived from [Elusive Icons](http://elusiveicons.com).
+
+Releasing
+---------
+
+Releases are published by GitHub Actions when a semantic version tag is pushed:
+
+```sh
+printf '1.2.3\n' > VERSION
+git add VERSION
+git commit -m "chore: release 1.2.3"
+make release-tag
+git push origin master v1.2.3
+```
+
+The workflow builds `Pasteboard Reset-1.2.3.zip`, creates the GitHub release,
+and uploads the archive. It can also be run manually from the Actions tab with
+a version input.
