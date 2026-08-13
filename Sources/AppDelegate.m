@@ -15,13 +15,14 @@ NSStatusItem *_statusItem;
 {
     _statusItem = [[NSStatusBar systemStatusBar] statusItemWithLength:NSVariableStatusItemLength];
     _statusItem.button.action = @selector(handleAction:);
+    [_statusItem.button sendActionOn:NSEventMaskLeftMouseUp | NSEventMaskRightMouseUp];
     NSDictionary *attributes = @{NSFontAttributeName: [NSFont fontWithName:@"pasteboard-reset" size:15]};
     _statusItem.button.attributedTitle = [[NSAttributedString alloc] initWithString:@"A" attributes:attributes];
 }
 
 - (void)handleAction:(id)sender
 {
-    if ([self hasInterestingModifierFlags:NSApp.currentEvent.modifierFlags])
+    if ([self shouldOpenMenuForEvent:NSApp.currentEvent])
     {
         _statusItem.menu = [self createMenu];
         [_statusItem.button performClick:sender];
@@ -32,14 +33,14 @@ NSStatusItem *_statusItem;
     [[NSPasteboard generalPasteboard] clearContents];
 }
 
-- (BOOL)hasInterestingModifierFlags:(NSEventModifierFlags)flags
+- (BOOL)shouldOpenMenuForEvent:(NSEvent *)event
 {
-    NSEventModifierFlags interestingFlags = NSEventModifierFlagShift |
-                                            NSEventModifierFlagControl |
-                                            NSEventModifierFlagOption |
-                                            NSEventModifierFlagCommand |
-                                            NSEventModifierFlagFunction;
-    return (flags & interestingFlags) != 0;
+    const NSEventModifierFlags interestingFlags = NSEventModifierFlagShift |
+                                                  NSEventModifierFlagControl |
+                                                  NSEventModifierFlagOption |
+                                                  NSEventModifierFlagCommand |
+                                                  NSEventModifierFlagFunction;
+    return event.type == NSEventTypeRightMouseUp || (event.modifierFlags & interestingFlags) != 0;
 }
 
 - (void)quit:(id)sender
