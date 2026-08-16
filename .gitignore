@@ -1,2 +1,4 @@
 .DS_Store
+.release/.changelog-context.json
+.release/node_modules/
 build/

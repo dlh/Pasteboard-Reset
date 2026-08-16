@@ -13,6 +13,13 @@ number of commits on the current branch. You can override both values:
 make release VERSION=1.2.3 BUILD_NUMBER=42
 ```
 
+Preview the next semantic-release version and release notes with:
+
+```sh
+npm ci --prefix .release
+make release-dry-run
+```
+
 Local builds are ad-hoc signed by default. To sign with a Developer ID
 certificate, pass the signing identity:
 

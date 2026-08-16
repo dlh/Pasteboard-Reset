@@ -65,7 +65,7 @@ else
 $(error CONFIGURATION must be debug or release)
 endif
 
-.PHONY: all debug release build prepare-build run sign archive notarize staple release-tag version clean icon pngcrush
+.PHONY: all debug release build prepare-build run sign archive notarize staple semantic-release-prepare release-dry-run version clean icon pngcrush
 
 all: release
 
@@ -148,16 +148,11 @@ archive: release
 	@rm -f "$(ARCHIVE)"
 	$(DITTO) -c -k --keepParent "$(APP_DIR)" "$(ARCHIVE)"
 
-release-tag:
-	@test -n "$(VERSION)" || (echo "VERSION is empty."; exit 1)
-	@printf '%s\n' "$(VERSION)" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$$' || (echo "VERSION must use semantic version format, such as 1.2.3."; exit 1)
-	@test "$$(git status --porcelain)" = "" || (echo "Working tree must be clean before tagging."; exit 1)
-	@test -z "$$(git tag --list "$(TAG_PREFIX)$(VERSION)")" || (echo "Tag $(TAG_PREFIX)$(VERSION) already exists."; exit 1)
-	git tag -a "$(TAG_PREFIX)$(VERSION)" -m "Release $(VERSION)"
-	@printf 'Created tag %s%s. Push it with: git push origin %s%s\n' "$(TAG_PREFIX)" "$(VERSION)" "$(TAG_PREFIX)" "$(VERSION)"
-
 version:
 	@printf '%s\n' "$(VERSION)"
+
+release-dry-run:
+	npm --prefix .release run release:dry-run
 
 notarize: archive
 	@test -n "$(NOTARY_PROFILE)" || (echo "Set NOTARY_PROFILE to a notarytool keychain profile name."; exit 1)
@@ -167,6 +162,19 @@ staple: notarize
 	xcrun stapler staple "$(APP_DIR)"
 	@rm -f "$(ARCHIVE)"
 	$(DITTO) -c -k --keepParent "$(APP_DIR)" "$(ARCHIVE)"
+
+semantic-release-prepare:
+	@test -n "$(VERSION)" || (echo "VERSION is empty."; exit 1)
+	@test -n "$(BUILD_NUMBER)" || (echo "BUILD_NUMBER is empty."; exit 1)
+	@test -n "$(SIGN_IDENTITY)" || (echo "SIGN_IDENTITY is empty."; exit 1)
+	@printf '%s\n' "$(VERSION)" > "$(VERSION_FILE)"
+	$(MAKE) staple VERSION="$(VERSION)" BUILD_NUMBER="$(BUILD_NUMBER)" SIGN_IDENTITY="$(SIGN_IDENTITY)" NOTARY_PROFILE="$(NOTARY_PROFILE)"
+	test "$$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "$(PROCESSED_INFO_PLIST)")" = "$(VERSION)"
+	test "$$(/usr/libexec/PlistBuddy -c 'Print :CFBundleVersion' "$(PROCESSED_INFO_PLIST)")" = "$(BUILD_NUMBER)"
+	$(CODESIGN) --verify --deep --strict --verbose=4 "$(APP_DIR)"
+	$(CODESIGN) -dv --verbose=4 "$(APP_DIR)" 2>&1 | grep -F "Authority=$(SIGN_IDENTITY)"
+	xcrun stapler validate "$(APP_DIR)"
+	spctl --assess --type execute --verbose=4 "$(APP_DIR)"
 
 run:
 	$(MAKE) CONFIGURATION="$(CONFIGURATION)" build

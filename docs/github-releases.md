@@ -1,17 +1,34 @@
 # GitHub Releases
 
-GitHub Actions publishes releases when a semantic version tag is pushed:
+GitHub Actions runs semantic-release after commits land on `master`:
 
 ```sh
-printf '1.2.3\n' > VERSION
-git add VERSION
-git commit -m "chore: release 1.2.3"
-make release-tag
-git push origin master v1.2.3
+git push origin master
 ```
 
-The release workflow can also be run manually from the Actions tab with a
-version input.
+semantic-release chooses the next version from commit subjects using
+Conventional Commit rules. Breaking changes become a major release, `feat:`
+commits become a minor release, and `fix:` or `perf:` commits become a patch
+release.
+
+Preview the next release locally:
+
+```sh
+npm ci --prefix .release
+make release-dry-run
+```
+
+When a release is needed, semantic-release updates `VERSION`, prepends
+`CHANGELOG.md`, commits those files with `skip-checks: true`, creates the `vX.Y.Z`
+tag, builds the signed and notarized archive, and publishes the GitHub Release
+with the generated release notes.
+
+Regenerate the historical changelog entries from existing tags and commit
+history with:
+
+```sh
+npm --prefix .release run changelog:backfill
+```
 
 ## Signing And Notarization
 

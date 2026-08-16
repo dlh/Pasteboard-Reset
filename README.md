@@ -6,6 +6,7 @@ A macOS menu bar application to clear the pasteboard.
 Documentation
 -------------
 
+- [Changelog](CHANGELOG.md)
 - [Development](docs/development.md)
 - [GitHub Releases](docs/github-releases.md)
 
