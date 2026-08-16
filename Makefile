@@ -165,6 +165,8 @@ notarize: archive
 
 staple: notarize
 	xcrun stapler staple "$(APP_DIR)"
+	@rm -f "$(ARCHIVE)"
+	$(DITTO) -c -k --keepParent "$(APP_DIR)" "$(ARCHIVE)"
 
 run:
 	$(MAKE) CONFIGURATION="$(CONFIGURATION)" build

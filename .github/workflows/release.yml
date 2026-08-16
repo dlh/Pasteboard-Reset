@@ -18,6 +18,9 @@ jobs:
   release:
     name: Build and publish release
     runs-on: macos-latest
+    env:
+      APP_NAME: Pasteboard Reset
+      NOTARY_PROFILE: PasteboardResetNotary
 
     steps:
       - name: Check out repository
@@ -43,19 +46,76 @@ jobs:
           echo "version=${version}" >> "${GITHUB_OUTPUT}"
           echo "tag=v${version}" >> "${GITHUB_OUTPUT}"
 
-      - name: Build archive
-        run: make archive VERSION="${{ steps.version.outputs.version }}" BUILD_NUMBER="${{ github.run_number }}"
+      - name: Import signing certificate
+        env:
+          APPLE_CERTIFICATE_P12_BASE64: ${{ secrets.APPLE_CERTIFICATE_P12_BASE64 }}
+          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+          KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
+        run: |
+          keychain_path="${RUNNER_TEMP}/app-signing.keychain-db"
+          certificate_path="${RUNNER_TEMP}/developer-id.p12"
+
+          security create-keychain -p "${KEYCHAIN_PASSWORD}" "${keychain_path}"
+          security set-keychain-settings -lut 21600 "${keychain_path}"
+          security unlock-keychain -p "${KEYCHAIN_PASSWORD}" "${keychain_path}"
+          security list-keychains -d user -s "${keychain_path}"
+          security default-keychain -d user -s "${keychain_path}"
+
+          printf '%s' "${APPLE_CERTIFICATE_P12_BASE64}" | base64 -D > "${certificate_path}"
+          security import "${certificate_path}" \
+            -k "${keychain_path}" \
+            -P "${APPLE_CERTIFICATE_PASSWORD}" \
+            -T /usr/bin/codesign \
+            -T /usr/bin/security
+
+          security set-key-partition-list \
+            -S apple-tool:,apple:,codesign: \
+            -s \
+            -k "${KEYCHAIN_PASSWORD}" \
+            "${keychain_path}"
+
+          security find-identity -v -p codesigning "${keychain_path}"
+
+      - name: Configure notarization
+        env:
+          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          xcrun notarytool store-credentials "${NOTARY_PROFILE}" \
+            --apple-id "${APPLE_ID}" \
+            --team-id "${APPLE_TEAM_ID}" \
+            --password "${APPLE_APP_SPECIFIC_PASSWORD}"
+
+      - name: Build, sign, notarize, and staple archive
+        env:
+          SIGN_IDENTITY: ${{ secrets.APPLE_SIGN_IDENTITY }}
+        run: |
+          make staple \
+            VERSION="${{ steps.version.outputs.version }}" \
+            BUILD_NUMBER="${{ github.run_number }}" \
+            SIGN_IDENTITY="${SIGN_IDENTITY}" \
+            NOTARY_PROFILE="${NOTARY_PROFILE}"
 
       - name: Verify app bundle version
         run: |
-          test "$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' 'build/Pasteboard Reset.app/Contents/Info.plist')" = "${{ steps.version.outputs.version }}"
-          test "$(/usr/libexec/PlistBuddy -c 'Print :CFBundleVersion' 'build/Pasteboard Reset.app/Contents/Info.plist')" = "${{ github.run_number }}"
+          test "$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "build/${APP_NAME}.app/Contents/Info.plist")" = "${{ steps.version.outputs.version }}"
+          test "$(/usr/libexec/PlistBuddy -c 'Print :CFBundleVersion' "build/${APP_NAME}.app/Contents/Info.plist")" = "${{ github.run_number }}"
+
+      - name: Verify signature and notarization
+        env:
+          SIGN_IDENTITY: ${{ secrets.APPLE_SIGN_IDENTITY }}
+        run: |
+          codesign --verify --deep --strict --verbose=4 "build/${APP_NAME}.app"
+          codesign -dv --verbose=4 "build/${APP_NAME}.app" 2>&1 | grep -F "Authority=${SIGN_IDENTITY}"
+          xcrun stapler validate "build/${APP_NAME}.app"
+          spctl --assess --type execute --verbose=4 "build/${APP_NAME}.app"
 
       - name: Create release
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          archive="build/Pasteboard Reset-${{ steps.version.outputs.version }}.zip"
+          archive="build/${APP_NAME}-${{ steps.version.outputs.version }}.zip"
 
           if gh release view "${{ steps.version.outputs.tag }}" >/dev/null 2>&1; then
             gh release upload "${{ steps.version.outputs.tag }}" "${archive}" --clobber
