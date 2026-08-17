@@ -2,11 +2,13 @@
 
 #import "AppDelegate.h"
 #import "LaunchAtLoginController.h"
+#import "PreferencesController.h"
 #import "StatusItemButton.h"
 
 @interface AppDelegate () <NSMenuDelegate>
 @property (nonatomic, assign) NSInteger clearFeedbackToken;
 @property (nonatomic, strong) LaunchAtLoginController *launchAtLoginController;
+@property (nonatomic, strong) PreferencesController *preferencesController;
 @property (nonatomic, strong) NSStatusItem *statusItem;
 @end
 
@@ -15,6 +17,7 @@
 - (void)applicationDidFinishLaunching:(NSNotification *)notification
 {
     self.launchAtLoginController = [[LaunchAtLoginController alloc] init];
+    self.preferencesController = [[PreferencesController alloc] init];
     self.statusItem = [[NSStatusBar systemStatusBar] statusItemWithLength:NSVariableStatusItemLength];
     [StatusItemButton configureButton:_statusItem.button target:self action:@selector(handleAction:)];
 }
@@ -29,7 +32,10 @@
     }
 
     [[NSPasteboard generalPasteboard] clearContents];
-    [self showClearFeedback];
+    if (_preferencesController.clickAnimationEnabled)
+    {
+        [self showClearFeedback];
+    }
 }
 
 - (void)showClearFeedback
@@ -62,6 +68,18 @@
     [NSApp orderFrontStandardAboutPanel:sender];
 }
 
+- (void)toggleClickAnimation:(id)sender
+{
+    BOOL enabled = !_preferencesController.clickAnimationEnabled;
+    _preferencesController.clickAnimationEnabled = enabled;
+
+    if (!enabled)
+    {
+        _clearFeedbackToken += 1;
+        [StatusItemButton resetClearFeedbackForButton:_statusItem.button];
+    }
+}
+
 - (NSMenu *)createMenu
 {
     NSMenu *menu = [[NSMenu alloc] init];
@@ -71,6 +89,8 @@
              keyEquivalent:@""].target = self;
     [menu addItem:[NSMenuItem separatorItem]];
     [menu addItem:[_launchAtLoginController menuItem]];
+    [menu addItem:[_preferencesController clickAnimationMenuItemWithTarget:self
+                                                                    action:@selector(toggleClickAnimation:)]];
     [menu addItem:[NSMenuItem separatorItem]];
     [menu addItemWithTitle:[NSString stringWithFormat:NSLocalizedString(@"Quit %@", nil), self.applicationName]
                     action:@selector(terminate:)
