@@ -106,6 +106,7 @@ $(STAMP_BINARY): $(SOURCES) Sources/AppDelegate.h Sources/Prefix.pch
 	@mkdir -p "$(MACOS_DIR)"
 	$(CLANG) $(COMMON_CFLAGS) $(CONFIGURATION_CFLAGS) \
 		-framework Cocoa \
+		-framework QuartzCore \
 		-framework ServiceManagement \
 		-o "$(EXECUTABLE)" \
 		$(SOURCES)

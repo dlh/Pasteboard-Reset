@@ -2,22 +2,47 @@
 
 #import "AppDelegate.h"
 
+#import <QuartzCore/QuartzCore.h>
 #import <ServiceManagement/ServiceManagement.h>
 
 @interface AppDelegate () <NSMenuDelegate>
+@property (nonatomic, assign) NSInteger clearFeedbackToken;
+@property (nonatomic, strong) NSStatusItem *statusItem;
 @end
 
 @implementation AppDelegate
 
-NSStatusItem *_statusItem;
+static const NSTimeInterval ClearFeedbackAnimationDuration = 0.14;
+static const CGFloat ClearFeedbackScale = 0.45;
+static const CGFloat StatusItemGlyphSize = 16.0;
+static NSString * const ClearFeedbackAnimationKey = @"clearFeedbackScale";
+static NSString * const ClearPasteboardAccessibilityIdentifier = @"ClearPasteboardStatusItem";
+static NSString * const StatusItemGlyph = @"A";
+static NSString * const StatusItemGlyphFontName = @"pasteboard-reset";
 
 - (void)applicationDidFinishLaunching:(NSNotification *)notification
 {
-    _statusItem = [[NSStatusBar systemStatusBar] statusItemWithLength:NSVariableStatusItemLength];
-    _statusItem.button.action = @selector(handleAction:);
-    [_statusItem.button sendActionOn:NSEventMaskLeftMouseUp | NSEventMaskRightMouseUp];
-    NSDictionary *attributes = @{NSFontAttributeName: [NSFont fontWithName:@"pasteboard-reset" size:15]};
-    _statusItem.button.attributedTitle = [[NSAttributedString alloc] initWithString:@"A" attributes:attributes];
+    self.statusItem = [[NSStatusBar systemStatusBar] statusItemWithLength:NSVariableStatusItemLength];
+
+    NSString *clearPasteboardLabel = NSLocalizedString(@"Clear Pasteboard", nil);
+    NSButton *button = _statusItem.button;
+    button.wantsLayer = YES;
+    [self centerStatusButtonLayerAnchorPoint];
+    button.alignment = NSTextAlignmentCenter;
+    button.target = self;
+    button.action = @selector(handleAction:);
+    [button sendActionOn:NSEventMaskLeftMouseUp | NSEventMaskRightMouseUp];
+
+    button.title = clearPasteboardLabel;
+    button.image = [self statusItemImageWithAccessibilityDescription:clearPasteboardLabel];
+    button.imagePosition = NSImageOnly;
+    button.imageScaling = NSImageScaleNone;
+    button.toolTip = clearPasteboardLabel;
+
+    button.accessibilityElement = YES;
+    button.accessibilityTitle = clearPasteboardLabel;
+    button.accessibilityLabel = clearPasteboardLabel;
+    button.accessibilityIdentifier = ClearPasteboardAccessibilityIdentifier;
 }
 
 - (void)handleAction:(id)sender
@@ -29,8 +54,64 @@ NSStatusItem *_statusItem;
         return;
     }
 
-    // The general pasteboard only holds one item
     [[NSPasteboard generalPasteboard] clearContents];
+    [self showClearFeedback];
+}
+
+- (void)showClearFeedback
+{
+    _clearFeedbackToken += 1;
+    NSInteger feedbackToken = _clearFeedbackToken;
+    NSButton *button = _statusItem.button;
+    button.alphaValue = 1.0;
+    [self centerStatusButtonLayerAnchorPoint];
+    button.layer.transform = CATransform3DIdentity;
+    [button.layer removeAnimationForKey:ClearFeedbackAnimationKey];
+
+    CABasicAnimation *animation = [CABasicAnimation animationWithKeyPath:@"transform.scale"];
+    animation.fromValue = @1.0;
+    animation.toValue = @(ClearFeedbackScale);
+    animation.duration = ClearFeedbackAnimationDuration;
+    animation.autoreverses = YES;
+    animation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
+    [button.layer addAnimation:animation forKey:ClearFeedbackAnimationKey];
+
+    dispatch_time_t resetTime = dispatch_time(DISPATCH_TIME_NOW,
+                                              (int64_t)(ClearFeedbackAnimationDuration * 2.0 * NSEC_PER_SEC));
+    dispatch_after(resetTime, dispatch_get_main_queue(), ^{
+        if (feedbackToken == _clearFeedbackToken)
+        {
+            button.layer.transform = CATransform3DIdentity;
+        }
+    });
+}
+
+- (void)centerStatusButtonLayerAnchorPoint
+{
+    CALayer *layer = _statusItem.button.layer;
+    CGRect frame = layer.frame;
+    layer.anchorPoint = CGPointMake(0.5, 0.5);
+    layer.frame = frame;
+}
+
+- (NSImage *)statusItemImageWithAccessibilityDescription:(NSString *)accessibilityDescription
+{
+    NSFont *font = [NSFont fontWithName:StatusItemGlyphFontName size:StatusItemGlyphSize] ?: [NSFont systemFontOfSize:StatusItemGlyphSize];
+    NSDictionary *attributes = @{
+        NSFontAttributeName: font,
+        NSForegroundColorAttributeName: NSColor.blackColor
+    };
+    NSSize glyphSize = [StatusItemGlyph sizeWithAttributes:attributes];
+    NSImage *image = [[NSImage alloc] initWithSize:glyphSize];
+    image.template = YES;
+    image.accessibilityDescription = accessibilityDescription;
+
+    [image lockFocus];
+    [StatusItemGlyph drawInRect:NSMakeRect(0.0, 0.0, glyphSize.width, glyphSize.height)
+                 withAttributes:attributes];
+    [image unlockFocus];
+
+    return image;
 }
 
 - (BOOL)shouldOpenMenuForEvent:(NSEvent *)event
