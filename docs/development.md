@@ -20,6 +20,9 @@ npm ci --prefix .release
 make release-dry-run
 ```
 
+Use the Conventional Commits format for commit messages so semantic-release can
+determine the next version and generate release notes correctly.
+
 Local builds are ad-hoc signed by default. To sign with a Developer ID
 certificate, pass the signing identity:
 
