@@ -56,11 +56,6 @@
     return event.type == NSEventTypeRightMouseUp || (event.modifierFlags & interestingFlags) != 0;
 }
 
-- (void)quit:(id)sender
-{
-    [NSApp terminate:self];
-}
-
 - (void)showAbout:(id)sender
 {
     [NSApp activateIgnoringOtherApps:YES];
@@ -78,8 +73,8 @@
     [menu addItem:[_launchAtLoginController menuItem]];
     [menu addItem:[NSMenuItem separatorItem]];
     [menu addItemWithTitle:[NSString stringWithFormat:NSLocalizedString(@"Quit %@", nil), self.applicationName]
-                    action:@selector(quit:)
-             keyEquivalent:@""].target = self;
+                    action:@selector(terminate:)
+             keyEquivalent:@""].target = NSApp;
     return menu;
 }
 
