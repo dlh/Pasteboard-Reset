@@ -1,3 +1,19 @@
+Pasteboard Reset Changelog
+=========================
+
+# [1.4.0](https://github.com/dlh/Pasteboard-Reset/compare/v1.3.1...v1.4.0) (2026-08-17)
+
+
+### Bug Fixes
+
+* **release:** run semantic-release from repository root ([ff9ad70](https://github.com/dlh/Pasteboard-Reset/commit/ff9ad70402728c4f8f11eec0e62f9f1691bc26e6))
+
+
+### Features
+
+* add animated pasteboard clear functionality and accessibility ([fb44ed0](https://github.com/dlh/Pasteboard-Reset/commit/fb44ed0672bdee8f67895cf0f7bbd672e4a41054))
+* add click animation preference ([2e2cee1](https://github.com/dlh/Pasteboard-Reset/commit/2e2cee16e257562eb8368d9da0c0bea44a589411))
+
 ## [1.3.1](https://github.com/dlh/Pasteboard-Reset/compare/v1.3.0...v1.3.1) (2026-08-16)
 
 ### Features
