@@ -4,8 +4,8 @@
   "description": "Release tooling for Pasteboard Reset.",
   "scripts": {
     "changelog:backfill": "node -e \"require('fs').writeFileSync('.changelog-context.json', JSON.stringify({version: require('fs').readFileSync('../VERSION', 'utf8').trim()}))\" && conventional-changelog -p angular -r 0 -c .changelog-context.json -i ../CHANGELOG.md -s && node -e \"const fs = require('fs'); fs.writeFileSync('../CHANGELOG.md', fs.readFileSync('../CHANGELOG.md', 'utf8').trimStart())\" && rm .changelog-context.json",
-    "release": "semantic-release --extends ./semantic-release.config.cjs",
-    "release:dry-run": "semantic-release --extends ./semantic-release.config.cjs --dry-run --no-ci --plugins @semantic-release/commit-analyzer @semantic-release/release-notes-generator"
+    "release": "cd .. && .release/node_modules/.bin/semantic-release --extends ./.release/semantic-release.config.cjs",
+    "release:dry-run": "cd .. && .release/node_modules/.bin/semantic-release --extends ./.release/semantic-release.config.cjs --dry-run --no-ci --plugins @semantic-release/commit-analyzer @semantic-release/release-notes-generator"
   },
   "engines": {
     "node": "^22.14.0 || >=24.10.0"

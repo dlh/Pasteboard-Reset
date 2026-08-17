@@ -8,7 +8,7 @@ module.exports = {
     [
       "@semantic-release/changelog",
       {
-        changelogFile: "../CHANGELOG.md",
+        changelogFile: "CHANGELOG.md",
         changelogTitle: "Pasteboard Reset Changelog\n=========================",
       },
     ],
@@ -16,13 +16,13 @@ module.exports = {
       "@semantic-release/exec",
       {
         prepareCmd:
-          "make -C .. semantic-release-prepare VERSION='${nextRelease.version}' BUILD_NUMBER=\"$GITHUB_RUN_NUMBER\" SIGN_IDENTITY=\"$APPLE_SIGN_IDENTITY\" NOTARY_PROFILE=\"$NOTARY_PROFILE\"",
+          "make semantic-release-prepare VERSION='${nextRelease.version}' BUILD_NUMBER=\"$GITHUB_RUN_NUMBER\" SIGN_IDENTITY=\"$APPLE_SIGN_IDENTITY\" NOTARY_PROFILE=\"$NOTARY_PROFILE\"",
       },
     ],
     [
       "@semantic-release/git",
       {
-        assets: ["../VERSION", "../CHANGELOG.md"],
+        assets: ["VERSION", "CHANGELOG.md"],
         message: "chore(release): ${nextRelease.version}\n\n${nextRelease.notes}\n\nskip-checks: true",
       },
     ],
@@ -31,7 +31,7 @@ module.exports = {
       {
         assets: [
           {
-            path: "../build/Pasteboard Reset-${nextRelease.version}.zip",
+            path: "build/Pasteboard Reset-*.zip",
             label: "Pasteboard Reset ${nextRelease.version}",
           },
         ],
