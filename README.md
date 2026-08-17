@@ -3,6 +3,12 @@ Pasteboard Reset
 
 A macOS menu bar application to clear the pasteboard.
 
+Usage
+-----
+
+- Left-click the menu bar icon to clear the pasteboard.
+- Right-click, control-click, or option-click the menu bar icon to open the menu.
+
 Documentation
 -------------
 
