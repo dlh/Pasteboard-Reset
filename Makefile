@@ -32,7 +32,7 @@ PLIST_SETTINGS_FILE := $(BUILD_DIR)/.plist.settings
 CONFIGURATION_FILE := $(BUILD_DIR)/.configuration
 SIGN_IDENTITY_FILE := $(BUILD_DIR)/.sign.identity
 
-SOURCES := Sources/main.m Sources/AppDelegate.m
+SOURCES := Sources/main.m Sources/AppDelegate.m Sources/LaunchAtLoginController.m Sources/StatusItemButton.m Sources/StatusItemIcon.m
 INFO_PLIST := Sources/Info.plist
 PLIST_DEPS := $(INFO_PLIST) $(VERSION_FILE)
 
@@ -102,7 +102,7 @@ prepare-build:
 		rm -f "$(STAMP_PLIST)" "$(STAMP_SIGN)"; \
 	fi
 
-$(STAMP_BINARY): $(SOURCES) Sources/AppDelegate.h Sources/Prefix.pch
+$(STAMP_BINARY): $(SOURCES) Sources/AppDelegate.h Sources/LaunchAtLoginController.h Sources/StatusItemButton.h Sources/StatusItemIcon.h Sources/Prefix.pch
 	@mkdir -p "$(MACOS_DIR)"
 	$(CLANG) $(COMMON_CFLAGS) $(CONFIGURATION_CFLAGS) \
 		-framework Cocoa \
