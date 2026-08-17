@@ -1,5 +1,7 @@
 # GitHub Releases
 
+Workflow actions are always pinned by commit ID.
+
 GitHub Actions runs semantic-release after commits land on `master`:
 
 ```sh
