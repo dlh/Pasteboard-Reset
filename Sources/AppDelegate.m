@@ -24,10 +24,16 @@
 
 - (void)handleAction:(id)sender
 {
-    if ([self shouldOpenMenuForEvent:NSApp.currentEvent])
+    NSEvent *event = NSApp.currentEvent;
+    if ([self shouldOpenMenuForEvent:event])
     {
         _statusItem.menu = [self createMenu];
         [_statusItem.button performClick:sender];
+        return;
+    }
+
+    if (event.type == NSEventTypeLeftMouseDown || event.type == NSEventTypeRightMouseDown)
+    {
         return;
     }
 
@@ -59,7 +65,7 @@
                                                   NSEventModifierFlagOption |
                                                   NSEventModifierFlagCommand |
                                                   NSEventModifierFlagFunction;
-    return event.type == NSEventTypeRightMouseUp || (event.modifierFlags & interestingFlags) != 0;
+    return event.type == NSEventTypeRightMouseDown || (event.modifierFlags & interestingFlags) != 0;
 }
 
 - (void)showAbout:(id)sender

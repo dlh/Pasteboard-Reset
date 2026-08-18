@@ -21,7 +21,7 @@ static NSString * const ClearPasteboardAccessibilityIdentifier = @"ClearPasteboa
     button.alignment = NSTextAlignmentCenter;
     button.target = target;
     button.action = action;
-    [button sendActionOn:NSEventMaskLeftMouseUp | NSEventMaskRightMouseUp];
+    [button sendActionOn:NSEventMaskLeftMouseDown | NSEventMaskLeftMouseUp | NSEventMaskRightMouseDown];
 
     button.title = clearPasteboardLabel;
     button.image = [StatusItemIcon imageWithAccessibilityDescription:clearPasteboardLabel];
