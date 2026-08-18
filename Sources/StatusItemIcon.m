@@ -16,14 +16,12 @@ static NSString * const StatusItemGlyphFontName = @"pasteboard-reset";
         NSForegroundColorAttributeName: NSColor.blackColor
     };
     NSSize glyphSize = [StatusItemGlyph sizeWithAttributes:attributes];
-    NSImage *image = [[NSImage alloc] initWithSize:glyphSize];
+    NSImage *image = [NSImage imageWithSize:glyphSize flipped:NO drawingHandler:^BOOL(NSRect dstRect) {
+        [StatusItemGlyph drawInRect:dstRect withAttributes:attributes];
+        return YES;
+    }];
     image.template = YES;
     image.accessibilityDescription = accessibilityDescription;
-
-    [image lockFocus];
-    [StatusItemGlyph drawInRect:NSMakeRect(0.0, 0.0, glyphSize.width, glyphSize.height)
-                 withAttributes:attributes];
-    [image unlockFocus];
 
     return image;
 }
