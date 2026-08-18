@@ -48,7 +48,6 @@ COMMON_CFLAGS := \
 	-fobjc-arc \
 	-fmodules \
 	-fmodules-cache-path=$(CLANG_MODULE_CACHE) \
-	-include Sources/Prefix.pch \
 	-isysroot $(SDKROOT) \
 	-mmacosx-version-min=$(MACOSX_DEPLOYMENT_TARGET) \
 	-Wall \
@@ -102,7 +101,7 @@ prepare-build:
 		rm -f "$(STAMP_PLIST)" "$(STAMP_SIGN)"; \
 	fi
 
-$(STAMP_BINARY): $(SOURCES) Sources/AppDelegate.h Sources/LaunchAtLoginController.h Sources/PreferencesController.h Sources/StatusItemButton.h Sources/StatusItemIcon.h Sources/Prefix.pch
+$(STAMP_BINARY): $(SOURCES) Sources/AppDelegate.h Sources/LaunchAtLoginController.h Sources/PreferencesController.h Sources/StatusItemButton.h Sources/StatusItemIcon.h
 	@mkdir -p "$(MACOS_DIR)"
 	$(CLANG) $(COMMON_CFLAGS) $(CONFIGURATION_CFLAGS) \
 		-framework Cocoa \

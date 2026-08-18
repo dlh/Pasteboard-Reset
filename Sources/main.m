@@ -3,12 +3,15 @@
 #import <Cocoa/Cocoa.h>
 #import "AppDelegate.h"
 
-int main(int argc, const char *argv[])
+int main(void)
 {
     @autoreleasepool
     {
-        id delegate = [[AppDelegate alloc] init];
-        [NSApplication sharedApplication].delegate = delegate;
-        return NSApplicationMain(argc, argv);
+        NSApplication *application = [NSApplication sharedApplication];
+        AppDelegate *delegate = [[AppDelegate alloc] init];
+        application.delegate = delegate;
+        [application run];
     }
+
+    return EXIT_SUCCESS;
 }
