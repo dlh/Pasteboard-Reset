@@ -1,6 +1,13 @@
 Pasteboard Reset Changelog
 =========================
 
+## [1.4.1](https://github.com/dlh/Pasteboard-Reset/compare/v1.4.0...v1.4.1) (2026-08-18)
+
+
+### Bug Fixes
+
+* open status item menu on mouse down ([45372c3](https://github.com/dlh/Pasteboard-Reset/commit/45372c386f7644a35b0e6097b5996b0e32736f25))
+
 # [1.4.0](https://github.com/dlh/Pasteboard-Reset/compare/v1.3.1...v1.4.0) (2026-08-17)
 
 
