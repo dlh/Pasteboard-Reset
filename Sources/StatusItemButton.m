@@ -37,10 +37,7 @@ static NSString * const ClearPasteboardAccessibilityIdentifier = @"ClearPasteboa
 
 + (void)showClearFeedbackForButton:(NSButton *)button completion:(void (^)(void))completion
 {
-    button.alphaValue = 1.0;
-    [self centerLayerAnchorPointForButton:button];
-    button.layer.transform = CATransform3DIdentity;
-    [button.layer removeAnimationForKey:ClearFeedbackAnimationKey];
+    [self resetClearFeedbackForButton:button];
 
     CABasicAnimation *animation = [CABasicAnimation animationWithKeyPath:@"transform.scale"];
     animation.fromValue = @1.0;
@@ -59,7 +56,9 @@ static NSString * const ClearPasteboardAccessibilityIdentifier = @"ClearPasteboa
 
 + (void)resetClearFeedbackForButton:(NSButton *)button
 {
+    [self centerLayerAnchorPointForButton:button];
     button.layer.transform = CATransform3DIdentity;
+    [button.layer removeAnimationForKey:ClearFeedbackAnimationKey];
 }
 
 + (void)centerLayerAnchorPointForButton:(NSButton *)button
