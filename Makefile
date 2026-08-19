@@ -33,6 +33,9 @@ CONFIGURATION_FILE := $(BUILD_DIR)/.configuration
 SIGN_IDENTITY_FILE := $(BUILD_DIR)/.sign.identity
 
 SOURCES := Sources/main.m Sources/AppDelegate.m Sources/GlobalHotKeyController.m Sources/LaunchAtLoginController.m Sources/SettingsController.m Sources/SettingsWindowController.m Sources/ShortcutRecorderControl.m Sources/StatusItemButton.m Sources/StatusItemIcon.m
+OBJ_DIR := $(BUILD_DIR)/obj/$(CONFIGURATION)
+OBJECTS := $(SOURCES:Sources/%.m=$(OBJ_DIR)/%.o)
+DEPFILES := $(OBJECTS:.o=.d)
 INFO_PLIST := Sources/Info.plist
 PLIST_DEPS := $(INFO_PLIST) $(VERSION_FILE)
 
@@ -101,7 +104,13 @@ prepare-build:
 		rm -f "$(STAMP_PLIST)" "$(STAMP_SIGN)"; \
 	fi
 
-$(STAMP_BINARY): $(SOURCES) Sources/AppDelegate.h Sources/GlobalHotKeyController.h Sources/LaunchAtLoginController.h Sources/SettingsController.h Sources/SettingsWindowController.h Sources/ShortcutKeyCode.h Sources/ShortcutRecorderControl.h Sources/StatusItemButton.h Sources/StatusItemIcon.h
+-include $(DEPFILES)
+
+$(OBJ_DIR)/%.o: Sources/%.m
+	@mkdir -p "$(dir $@)"
+	$(CLANG) $(COMMON_CFLAGS) $(CONFIGURATION_CFLAGS) -MMD -MP -c -o "$@" "$<"
+
+$(STAMP_BINARY): $(OBJECTS)
 	@mkdir -p "$(MACOS_DIR)"
 	$(CLANG) $(COMMON_CFLAGS) $(CONFIGURATION_CFLAGS) \
 		-framework Carbon \
@@ -109,7 +118,7 @@ $(STAMP_BINARY): $(SOURCES) Sources/AppDelegate.h Sources/GlobalHotKeyController
 		-framework QuartzCore \
 		-framework ServiceManagement \
 		-o "$(EXECUTABLE)" \
-		$(SOURCES)
+		$(OBJECTS)
 	@touch "$@"
 
 $(STAMP_PLIST): $(PLIST_DEPS)
