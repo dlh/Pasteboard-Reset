@@ -8,6 +8,8 @@ Usage
 
 - Left-click the menu bar icon to clear the pasteboard.
 - Right-click or modifier-click the menu bar icon to open the menu.
+- Set a global keyboard shortcut in Settings to clear the pasteboard from
+  anywhere.
 
 Documentation
 -------------

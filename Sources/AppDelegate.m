@@ -1,14 +1,18 @@
 // Copyright (c) 2014 DLH
 
 #import "AppDelegate.h"
+#import "GlobalHotKeyController.h"
 #import "LaunchAtLoginController.h"
-#import "PreferencesController.h"
+#import "SettingsController.h"
+#import "SettingsWindowController.h"
 #import "StatusItemButton.h"
 
 @interface AppDelegate () <NSMenuDelegate>
 @property (nonatomic, assign) NSInteger clearFeedbackToken;
+@property (nonatomic, strong) GlobalHotKeyController *globalHotKeyController;
 @property (nonatomic, strong) LaunchAtLoginController *launchAtLoginController;
-@property (nonatomic, strong) PreferencesController *preferencesController;
+@property (nonatomic, strong) SettingsController *settingsController;
+@property (nonatomic, strong) SettingsWindowController *settingsWindowController;
 @property (nonatomic, strong) NSStatusItem *statusItem;
 @end
 
@@ -16,10 +20,28 @@
 
 - (void)applicationDidFinishLaunching:(NSNotification *)notification
 {
+    [self configureMainMenu];
+
     self.launchAtLoginController = [[LaunchAtLoginController alloc] init];
-    self.preferencesController = [[PreferencesController alloc] init];
+    self.settingsController = [[SettingsController alloc] init];
     self.statusItem = [[NSStatusBar systemStatusBar] statusItemWithLength:NSVariableStatusItemLength];
     [StatusItemButton configureButton:_statusItem.button target:self action:@selector(handleAction:)];
+
+    self.globalHotKeyController = [[GlobalHotKeyController alloc] initWithTarget:self action:@selector(clearPasteboard:)];
+    [_globalHotKeyController updateWithKeyCode:_settingsController.clearPasteboardShortcutKeyCode
+                                  modifierFlags:_settingsController.clearPasteboardShortcutModifierFlags];
+
+    __weak typeof(self) weakSelf = self;
+    self.settingsWindowController = [[SettingsWindowController alloc]
+        initWithSettingsController:_settingsController
+                   applicationName:self.applicationName
+           launchAtLoginController:_launchAtLoginController
+       clearAnimationChangeHandler:^(BOOL enabled) {
+           [weakSelf handleClearAnimationChange:enabled];
+       }
+             shortcutChangeHandler:^BOOL(NSInteger keyCode, NSEventModifierFlags modifierFlags) {
+                 return [weakSelf.globalHotKeyController updateWithKeyCode:keyCode modifierFlags:modifierFlags];
+             }];
 }
 
 - (void)handleAction:(id)sender
@@ -37,11 +59,21 @@
         return;
     }
 
+    [self clearPasteboard:sender];
+}
+
+- (void)clearPasteboard:(id)sender
+{
     [[NSPasteboard generalPasteboard] clearContents];
-    if (_preferencesController.clickAnimationEnabled)
+    if (_settingsController.clearAnimationEnabled)
     {
         [self showClearFeedback];
     }
+}
+
+- (void)showSettings:(id)sender
+{
+    [_settingsWindowController showWindow:sender];
 }
 
 - (void)showClearFeedback
@@ -74,16 +106,30 @@
     [NSApp orderFrontStandardAboutPanel:sender];
 }
 
-- (void)toggleClickAnimation:(id)sender
+- (void)handleClearAnimationChange:(BOOL)enabled
 {
-    BOOL enabled = !_preferencesController.clickAnimationEnabled;
-    _preferencesController.clickAnimationEnabled = enabled;
-
     if (!enabled)
     {
         _clearFeedbackToken += 1;
         [StatusItemButton resetClearFeedbackForButton:_statusItem.button];
     }
+}
+
+- (void)configureMainMenu
+{
+    // LSUIElement apps have no visible menu bar, but a main menu still supplies key
+    // equivalents (e.g. Cmd-W to close whichever window is key, like the About panel).
+    // Top-level main menu items don't carry actions/key equivalents themselves; the
+    // item needs a submenu to hold the actionable entry.
+    NSMenu *mainMenu = [[NSMenu alloc] init];
+    NSMenuItem *fileMenuItem = [[NSMenuItem alloc] init];
+    [mainMenu addItem:fileMenuItem];
+
+    NSMenu *fileMenu = [[NSMenu alloc] init];
+    [fileMenu addItemWithTitle:NSLocalizedString(@"Close", nil) action:@selector(performClose:) keyEquivalent:@"w"];
+    fileMenuItem.submenu = fileMenu;
+
+    NSApp.mainMenu = mainMenu;
 }
 
 - (NSMenu *)createMenu
@@ -94,9 +140,9 @@
                     action:@selector(showAbout:)
              keyEquivalent:@""].target = self;
     [menu addItem:[NSMenuItem separatorItem]];
-    [menu addItem:[_launchAtLoginController menuItem]];
-    [menu addItem:[_preferencesController clickAnimationMenuItemWithTarget:self
-                                                                    action:@selector(toggleClickAnimation:)]];
+    [menu addItemWithTitle:NSLocalizedString(@"Settings…", nil)
+                    action:@selector(showSettings:)
+             keyEquivalent:@""].target = self;
     [menu addItem:[NSMenuItem separatorItem]];
     [menu addItemWithTitle:[NSString stringWithFormat:NSLocalizedString(@"Quit %@", nil), self.applicationName]
                     action:@selector(terminate:)

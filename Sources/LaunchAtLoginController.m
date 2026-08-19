@@ -6,17 +6,7 @@
 
 @implementation LaunchAtLoginController
 
-- (NSMenuItem *)menuItem
-{
-    NSMenuItem *item = [[NSMenuItem alloc] initWithTitle:[self menuTitle]
-                                                  action:@selector(toggleLaunchAtLogin:)
-                                           keyEquivalent:@""];
-    item.target = self;
-    item.state = [self menuState];
-    return item;
-}
-
-- (void)toggleLaunchAtLogin:(id)sender
+- (void)toggle
 {
     NSError *error = nil;
     SMAppService *service = SMAppService.mainAppService;
@@ -29,7 +19,7 @@
     }
 }
 
-- (NSString *)menuTitle
+- (NSString *)title
 {
     if (SMAppService.mainAppService.status == SMAppServiceStatusRequiresApproval)
     {
@@ -39,7 +29,7 @@
     return NSLocalizedString(@"Launch at Login", nil);
 }
 
-- (NSControlStateValue)menuState
+- (NSControlStateValue)state
 {
     switch (SMAppService.mainAppService.status)
     {

@@ -3,5 +3,8 @@
 #import <Cocoa/Cocoa.h>
 
 @interface LaunchAtLoginController : NSObject
-- (NSMenuItem *)menuItem;
+@property (nonatomic, readonly) NSString *title;
+@property (nonatomic, readonly) NSControlStateValue state;
+
+- (void)toggle;
 @end
