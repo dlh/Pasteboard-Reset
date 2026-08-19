@@ -1,6 +1,13 @@
 Pasteboard Reset Changelog
 =========================
 
+# [1.5.0](https://github.com/dlh/Pasteboard-Reset/compare/v1.4.1...v1.5.0) (2026-08-19)
+
+
+### Features
+
+* add global keyboard shortcut ([291be22](https://github.com/dlh/Pasteboard-Reset/commit/291be22253741bd655ee21ca29ecab6c4ba5a5d3))
+
 ## [1.4.1](https://github.com/dlh/Pasteboard-Reset/compare/v1.4.0...v1.4.1) (2026-08-18)
 
 
