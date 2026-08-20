@@ -11,7 +11,8 @@
     NSError *error = nil;
     SMAppService *service = SMAppService.mainAppService;
     BOOL shouldLaunchAtLogin = ![self isRegistered];
-    BOOL success = shouldLaunchAtLogin ? [service registerAndReturnError:&error] : [service unregisterAndReturnError:&error];
+    BOOL success =
+        shouldLaunchAtLogin ? [service registerAndReturnError:&error] : [service unregisterAndReturnError:&error];
 
     if (!success)
     {
@@ -33,13 +34,13 @@
 {
     switch (SMAppService.mainAppService.status)
     {
-        case SMAppServiceStatusEnabled:
-            return NSControlStateValueOn;
-        case SMAppServiceStatusRequiresApproval:
-            return NSControlStateValueMixed;
-        case SMAppServiceStatusNotRegistered:
-        case SMAppServiceStatusNotFound:
-            return NSControlStateValueOff;
+    case SMAppServiceStatusEnabled:
+        return NSControlStateValueOn;
+    case SMAppServiceStatusRequiresApproval:
+        return NSControlStateValueMixed;
+    case SMAppServiceStatusNotRegistered:
+    case SMAppServiceStatusNotFound:
+        return NSControlStateValueOff;
     }
 
     return NSControlStateValueOff;
@@ -57,7 +58,8 @@
 
     NSAlert *alert = [[NSAlert alloc] init];
     alert.messageText = NSLocalizedString(@"Could Not Update Launch at Login", nil);
-    alert.informativeText = error.localizedDescription ?: NSLocalizedString(@"The login item setting could not be changed.", nil);
+    alert.informativeText =
+        error.localizedDescription ?: NSLocalizedString(@"The login item setting could not be changed.", nil);
     [alert addButtonWithTitle:NSLocalizedString(@"OK", nil)];
     [alert runModal];
 }

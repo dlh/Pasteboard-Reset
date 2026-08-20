@@ -54,8 +54,8 @@ static OSStatus HotKeyEventHandler(EventHandlerCallRef nextHandler, EventRef eve
     }
 
     EventHotKeyID hotKeyID = { .signature = HotKeySignature, .id = HotKeyID };
-    OSStatus status = RegisterEventHotKey((UInt32)keyCode, [self carbonModifiersForCocoaModifiers:modifierFlags], hotKeyID,
-                                           GetApplicationEventTarget(), 0, &_hotKeyRef);
+    OSStatus status = RegisterEventHotKey((UInt32)keyCode, [self carbonModifiersForCocoaModifiers:modifierFlags],
+                                          hotKeyID, GetApplicationEventTarget(), 0, &_hotKeyRef);
     if (status != noErr)
     {
         _hotKeyRef = NULL;
@@ -75,10 +75,14 @@ static OSStatus HotKeyEventHandler(EventHandlerCallRef nextHandler, EventRef eve
 - (UInt32)carbonModifiersForCocoaModifiers:(NSEventModifierFlags)modifierFlags
 {
     UInt32 carbonModifiers = 0;
-    if (modifierFlags & NSEventModifierFlagCommand) carbonModifiers |= cmdKey;
-    if (modifierFlags & NSEventModifierFlagOption) carbonModifiers |= optionKey;
-    if (modifierFlags & NSEventModifierFlagControl) carbonModifiers |= controlKey;
-    if (modifierFlags & NSEventModifierFlagShift) carbonModifiers |= shiftKey;
+    if (modifierFlags & NSEventModifierFlagCommand)
+        carbonModifiers |= cmdKey;
+    if (modifierFlags & NSEventModifierFlagOption)
+        carbonModifiers |= optionKey;
+    if (modifierFlags & NSEventModifierFlagControl)
+        carbonModifiers |= controlKey;
+    if (modifierFlags & NSEventModifierFlagShift)
+        carbonModifiers |= shiftKey;
     return carbonModifiers;
 }
 
@@ -94,8 +98,8 @@ static OSStatus HotKeyEventHandler(EventHandlerCallRef nextHandler, EventRef eve
     (void)nextHandler;
 
     EventHotKeyID hotKeyID;
-    OSStatus status = GetEventParameter(event, kEventParamDirectObject, typeEventHotKeyID, NULL,
-                                         sizeof(hotKeyID), NULL, &hotKeyID);
+    OSStatus status =
+        GetEventParameter(event, kEventParamDirectObject, typeEventHotKeyID, NULL, sizeof(hotKeyID), NULL, &hotKeyID);
     if (status != noErr || hotKeyID.signature != HotKeySignature || hotKeyID.id != HotKeyID)
     {
         return eventNotHandledErr;

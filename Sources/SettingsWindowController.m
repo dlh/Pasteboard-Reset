@@ -33,9 +33,9 @@ static NSString *const GitHubProjectURLString = @"https://github.com/dlh/Pastebo
                      shortcutChangeHandler:(BOOL (^)(NSInteger, NSEventModifierFlags))shortcutChangeHandler
 {
     NSWindow *window = [[NSWindow alloc] initWithContentRect:ContentRect
-                                                    styleMask:NSWindowStyleMaskTitled | NSWindowStyleMaskClosable
-                                                      backing:NSBackingStoreBuffered
-                                                        defer:NO];
+                                                   styleMask:NSWindowStyleMaskTitled | NSWindowStyleMaskClosable
+                                                     backing:NSBackingStoreBuffered
+                                                       defer:NO];
     window.title = applicationName;
     window.releasedWhenClosed = NO;
     [window center];
@@ -108,8 +108,8 @@ static NSString *const GitHubProjectURLString = @"https://github.com/dlh/Pastebo
 }
 
 - (NSToolbarItem *)toolbar:(NSToolbar *)toolbar
-      itemForItemIdentifier:(NSToolbarItemIdentifier)itemIdentifier
-  willBeInsertedIntoToolbar:(BOOL)flag
+        itemForItemIdentifier:(NSToolbarItemIdentifier)itemIdentifier
+    willBeInsertedIntoToolbar:(BOOL)flag
 {
     NSToolbarItem *item = [[NSToolbarItem alloc] initWithItemIdentifier:itemIdentifier];
     item.target = self;
@@ -142,30 +142,32 @@ static NSString *const GitHubProjectURLString = @"https://github.com/dlh/Pastebo
     const CGFloat width = size.width - Margin * 2;
 
     NSButton *launchAtLoginCheckbox = [NSButton checkboxWithTitle:_launchAtLoginController.title
-                                                             target:self
-                                                             action:@selector(toggleLaunchAtLogin:)];
+                                                           target:self
+                                                           action:@selector(toggleLaunchAtLogin:)];
     launchAtLoginCheckbox.allowsMixedState = YES;
     launchAtLoginCheckbox.frame = NSMakeRect(Margin, 180, width, 18);
     [pane addSubview:launchAtLoginCheckbox];
     _launchAtLoginCheckbox = launchAtLoginCheckbox;
     [self refreshLaunchAtLoginCheckbox];
 
-    NSTextField *launchAtLoginDescription = [self buildDescriptionLabelWithString:
-        NSLocalizedString(@"Automatically start when you log in.", nil)
-                                                                              frame:NSMakeRect(Margin, 162, width, 16)];
+    NSTextField *launchAtLoginDescription =
+        [self buildDescriptionLabelWithString:NSLocalizedString(@"Automatically start when you log in.", nil)
+                                        frame:NSMakeRect(Margin, 162, width, 16)];
     [pane addSubview:launchAtLoginDescription];
 
     NSButton *clearAnimationCheckbox = [NSButton checkboxWithTitle:NSLocalizedString(@"Clear Animation", nil)
-                                                              target:self
-                                                              action:@selector(toggleClearAnimation:)];
-    clearAnimationCheckbox.state = _settingsController.isClearAnimationEnabled ? NSControlStateValueOn : NSControlStateValueOff;
+                                                            target:self
+                                                            action:@selector(toggleClearAnimation:)];
+    clearAnimationCheckbox.state =
+        _settingsController.isClearAnimationEnabled ? NSControlStateValueOn : NSControlStateValueOff;
     clearAnimationCheckbox.frame = NSMakeRect(Margin, 132, width, 18);
     [pane addSubview:clearAnimationCheckbox];
 
     // Two lines at this width; the others fit on one, hence the taller frame.
-    NSTextField *clearAnimationDescription = [self buildDescriptionLabelWithString:
-        NSLocalizedString(@"Briefly pulse the menu bar icon when the pasteboard is cleared.", nil)
-                                                                               frame:NSMakeRect(Margin, 102, width, 28)];
+    NSTextField *clearAnimationDescription = [self
+        buildDescriptionLabelWithString:NSLocalizedString(
+                                            @"Briefly pulse the menu bar icon when the pasteboard is cleared.", nil)
+                                  frame:NSMakeRect(Margin, 102, width, 28)];
     [pane addSubview:clearAnimationDescription];
 
     NSTextField *label = [NSTextField labelWithString:NSLocalizedString(@"Clear Pasteboard Shortcut:", nil)];
@@ -179,9 +181,9 @@ static NSString *const GitHubProjectURLString = @"https://github.com/dlh/Pastebo
     recorder.action = @selector(shortcutDidChange:);
     [pane addSubview:recorder];
 
-    NSTextField *caption = [self buildDescriptionLabelWithString:
-        NSLocalizedString(@"Press ⎋ to cancel or ⌫ to clear.", nil)
-                                                             frame:NSMakeRect(Margin, 20, width, 16)];
+    NSTextField *caption =
+        [self buildDescriptionLabelWithString:NSLocalizedString(@"Press ⎋ to cancel or ⌫ to clear.", nil)
+                                        frame:NSMakeRect(Margin, 20, width, 16)];
     [pane addSubview:caption];
 
     return pane;
@@ -205,7 +207,7 @@ static NSString *const GitHubProjectURLString = @"https://github.com/dlh/Pastebo
 
     NSDictionary *info = NSBundle.mainBundle.infoDictionary;
     NSString *versionText = [NSString stringWithFormat:NSLocalizedString(@"Version %@ (%@)", nil),
-                              info[@"CFBundleShortVersionString"], info[@"CFBundleVersion"]];
+                                                       info[@"CFBundleShortVersionString"], info[@"CFBundleVersion"]];
     NSString *githubLinkText = NSLocalizedString(@"GitHub Project", nil);
     NSString *copyrightText = info[@"NSHumanReadableCopyright"] ?: @"";
 
@@ -213,10 +215,11 @@ static NSString *const GitHubProjectURLString = @"https://github.com/dlh/Pastebo
     // the pane's margin, so the icon+text group can be centered as a whole.
     NSFont *nameFont = [NSFont boldSystemFontOfSize:15];
     NSFont *smallFont = [NSFont systemFontOfSize:NSFont.smallSystemFontSize];
-    const CGFloat textWidth = ceil(MAX(MAX([_applicationName sizeWithAttributes:@{ NSFontAttributeName: nameFont }].width,
-                                            [versionText sizeWithAttributes:@{ NSFontAttributeName: smallFont }].width),
-                                        MAX([githubLinkText sizeWithAttributes:@{ NSFontAttributeName: smallFont }].width,
-                                            [copyrightText sizeWithAttributes:@{ NSFontAttributeName: smallFont }].width)));
+    const CGFloat textWidth =
+        ceil(MAX(MAX([_applicationName sizeWithAttributes:@{ NSFontAttributeName : nameFont }].width,
+                     [versionText sizeWithAttributes:@{ NSFontAttributeName : smallFont }].width),
+                 MAX([githubLinkText sizeWithAttributes:@{ NSFontAttributeName : smallFont }].width,
+                     [copyrightText sizeWithAttributes:@{ NSFontAttributeName : smallFont }].width)));
 
     const CGFloat groupWidth = iconSize + columnGap + textWidth;
     const CGFloat groupX = (size.width - groupWidth) / 2.0;
@@ -259,8 +262,8 @@ static NSString *const GitHubProjectURLString = @"https://github.com/dlh/Pastebo
 
 - (NSTextField *)buildGitHubLinkLabel
 {
-    NSMutableAttributedString *linkText = [[NSMutableAttributedString alloc]
-        initWithString:NSLocalizedString(@"GitHub Project", nil)];
+    NSMutableAttributedString *linkText =
+        [[NSMutableAttributedString alloc] initWithString:NSLocalizedString(@"GitHub Project", nil)];
     NSRange range = NSMakeRange(0, linkText.length);
     [linkText addAttribute:NSLinkAttributeName value:GitHubProjectURLString range:range];
     [linkText addAttribute:NSFontAttributeName value:[NSFont systemFontOfSize:NSFont.smallSystemFontSize] range:range];
@@ -319,7 +322,8 @@ static NSString *const GitHubProjectURLString = @"https://github.com/dlh/Pastebo
 
     NSAlert *alert = [[NSAlert alloc] init];
     alert.messageText = NSLocalizedString(@"Could Not Set Shortcut", nil);
-    alert.informativeText = NSLocalizedString(@"That key combination is already in use by the system or another app.", nil);
+    alert.informativeText =
+        NSLocalizedString(@"That key combination is already in use by the system or another app.", nil);
     [alert addButtonWithTitle:NSLocalizedString(@"OK", nil)];
     [alert runModal];
 }

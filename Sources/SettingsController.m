@@ -4,9 +4,9 @@
 
 #import "ShortcutKeyCode.h"
 
-static NSString * const ClearAnimationEnabledDefaultsKey = @"ClickAnimationEnabled";
-static NSString * const ClearPasteboardShortcutKeyCodeDefaultsKey = @"ClearPasteboardShortcutKeyCode";
-static NSString * const ClearPasteboardShortcutModifierFlagsDefaultsKey = @"ClearPasteboardShortcutModifierFlags";
+static NSString *const ClearAnimationEnabledDefaultsKey = @"ClickAnimationEnabled";
+static NSString *const ClearPasteboardShortcutKeyCodeDefaultsKey = @"ClearPasteboardShortcutKeyCode";
+static NSString *const ClearPasteboardShortcutModifierFlagsDefaultsKey = @"ClearPasteboardShortcutModifierFlags";
 
 @implementation SettingsController
 
@@ -16,9 +16,9 @@ static NSString * const ClearPasteboardShortcutModifierFlagsDefaultsKey = @"Clea
     if (self)
     {
         [NSUserDefaults.standardUserDefaults registerDefaults:@{
-            ClearAnimationEnabledDefaultsKey: @YES,
-            ClearPasteboardShortcutKeyCodeDefaultsKey: @(ShortcutKeyCodeNone),
-            ClearPasteboardShortcutModifierFlagsDefaultsKey: @0
+            ClearAnimationEnabledDefaultsKey : @YES,
+            ClearPasteboardShortcutKeyCodeDefaultsKey : @(ShortcutKeyCodeNone),
+            ClearPasteboardShortcutModifierFlagsDefaultsKey : @0
         }];
     }
     return self;
@@ -31,8 +31,7 @@ static NSString * const ClearPasteboardShortcutModifierFlagsDefaultsKey = @"Clea
 
 - (void)setClearAnimationEnabled:(BOOL)clearAnimationEnabled
 {
-    [NSUserDefaults.standardUserDefaults setBool:clearAnimationEnabled
-                                          forKey:ClearAnimationEnabledDefaultsKey];
+    [NSUserDefaults.standardUserDefaults setBool:clearAnimationEnabled forKey:ClearAnimationEnabledDefaultsKey];
 }
 
 - (NSInteger)clearPasteboardShortcutKeyCode
@@ -43,18 +42,19 @@ static NSString * const ClearPasteboardShortcutModifierFlagsDefaultsKey = @"Clea
 - (void)setClearPasteboardShortcutKeyCode:(NSInteger)clearPasteboardShortcutKeyCode
 {
     [NSUserDefaults.standardUserDefaults setInteger:clearPasteboardShortcutKeyCode
-                                              forKey:ClearPasteboardShortcutKeyCodeDefaultsKey];
+                                             forKey:ClearPasteboardShortcutKeyCodeDefaultsKey];
 }
 
 - (NSEventModifierFlags)clearPasteboardShortcutModifierFlags
 {
-    return (NSEventModifierFlags)[NSUserDefaults.standardUserDefaults integerForKey:ClearPasteboardShortcutModifierFlagsDefaultsKey];
+    return (NSEventModifierFlags)
+        [NSUserDefaults.standardUserDefaults integerForKey:ClearPasteboardShortcutModifierFlagsDefaultsKey];
 }
 
 - (void)setClearPasteboardShortcutModifierFlags:(NSEventModifierFlags)clearPasteboardShortcutModifierFlags
 {
     [NSUserDefaults.standardUserDefaults setInteger:(NSInteger)clearPasteboardShortcutModifierFlags
-                                              forKey:ClearPasteboardShortcutModifierFlagsDefaultsKey];
+                                             forKey:ClearPasteboardShortcutModifierFlagsDefaultsKey];
 }
 
 @end

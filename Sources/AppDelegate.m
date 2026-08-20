@@ -27,21 +27,21 @@
     self.statusItem = [[NSStatusBar systemStatusBar] statusItemWithLength:NSVariableStatusItemLength];
     [StatusItemButton configureButton:_statusItem.button target:self action:@selector(handleAction:)];
 
-    self.globalHotKeyController = [[GlobalHotKeyController alloc] initWithTarget:self action:@selector(clearPasteboard:)];
+    self.globalHotKeyController = [[GlobalHotKeyController alloc] initWithTarget:self
+                                                                          action:@selector(clearPasteboard:)];
     [_globalHotKeyController updateWithKeyCode:_settingsController.clearPasteboardShortcutKeyCode
-                                  modifierFlags:_settingsController.clearPasteboardShortcutModifierFlags];
+                                 modifierFlags:_settingsController.clearPasteboardShortcutModifierFlags];
 
     __weak typeof(self) weakSelf = self;
-    self.settingsWindowController = [[SettingsWindowController alloc]
-        initWithSettingsController:_settingsController
-                   applicationName:self.applicationName
-           launchAtLoginController:_launchAtLoginController
-       clearAnimationChangeHandler:^(BOOL enabled) {
-           [weakSelf handleClearAnimationChange:enabled];
-       }
-             shortcutChangeHandler:^BOOL(NSInteger keyCode, NSEventModifierFlags modifierFlags) {
-                 return [weakSelf.globalHotKeyController updateWithKeyCode:keyCode modifierFlags:modifierFlags];
-             }];
+    self.settingsWindowController = [[SettingsWindowController alloc] initWithSettingsController:_settingsController
+        applicationName:self.applicationName
+        launchAtLoginController:_launchAtLoginController
+        clearAnimationChangeHandler:^(BOOL enabled) {
+            [weakSelf handleClearAnimationChange:enabled];
+        }
+        shortcutChangeHandler:^BOOL(NSInteger keyCode, NSEventModifierFlags modifierFlags) {
+            return [weakSelf.globalHotKeyController updateWithKeyCode:keyCode modifierFlags:modifierFlags];
+        }];
 }
 
 - (void)handleAction:(id)sender
@@ -82,20 +82,19 @@
     NSInteger feedbackToken = _clearFeedbackToken;
     NSButton *button = _statusItem.button;
 
-    [StatusItemButton showClearFeedbackForButton:button completion:^{
-        if (feedbackToken == _clearFeedbackToken)
-        {
-            [StatusItemButton resetClearFeedbackForButton:button];
-        }
-    }];
+    [StatusItemButton showClearFeedbackForButton:button
+                                      completion:^{
+                                          if (feedbackToken == _clearFeedbackToken)
+                                          {
+                                              [StatusItemButton resetClearFeedbackForButton:button];
+                                          }
+                                      }];
 }
 
 - (BOOL)shouldOpenMenuForEvent:(NSEvent *)event
 {
-    const NSEventModifierFlags interestingFlags = NSEventModifierFlagShift |
-                                                  NSEventModifierFlagControl |
-                                                  NSEventModifierFlagOption |
-                                                  NSEventModifierFlagCommand |
+    const NSEventModifierFlags interestingFlags = NSEventModifierFlagShift | NSEventModifierFlagControl |
+                                                  NSEventModifierFlagOption | NSEventModifierFlagCommand |
                                                   NSEventModifierFlagFunction;
     return event.type == NSEventTypeRightMouseDown || (event.modifierFlags & interestingFlags) != 0;
 }
@@ -130,13 +129,13 @@
 {
     NSMenu *menu = [[NSMenu alloc] init];
     menu.delegate = self;
-    [menu addItemWithTitle:NSLocalizedString(@"Settings…", nil)
-                    action:@selector(showSettings:)
-             keyEquivalent:@","].target = self;
+    [menu addItemWithTitle:NSLocalizedString(@"Settings…", nil) action:@selector(showSettings:) keyEquivalent:@","]
+        .target = self;
     [menu addItem:[NSMenuItem separatorItem]];
     [menu addItemWithTitle:[NSString stringWithFormat:NSLocalizedString(@"Quit %@", nil), self.applicationName]
                     action:@selector(terminate:)
-             keyEquivalent:@"q"].target = NSApp;
+             keyEquivalent:@"q"]
+        .target = NSApp;
     return menu;
 }
 

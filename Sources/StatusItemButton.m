@@ -9,8 +9,8 @@
 
 static const NSTimeInterval ClearFeedbackAnimationDuration = 0.14;
 static const CGFloat ClearFeedbackScale = 0.45;
-static NSString * const ClearFeedbackAnimationKey = @"clearFeedbackScale";
-static NSString * const ClearPasteboardAccessibilityIdentifier = @"ClearPasteboardStatusItem";
+static NSString *const ClearFeedbackAnimationKey = @"clearFeedbackScale";
+static NSString *const ClearPasteboardAccessibilityIdentifier = @"ClearPasteboardStatusItem";
 
 + (void)configureButton:(NSButton *)button target:(id)target action:(SEL)action
 {
@@ -47,8 +47,8 @@ static NSString * const ClearPasteboardAccessibilityIdentifier = @"ClearPasteboa
     animation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
     [button.layer addAnimation:animation forKey:ClearFeedbackAnimationKey];
 
-    dispatch_time_t resetTime = dispatch_time(DISPATCH_TIME_NOW,
-                                              (int64_t)(ClearFeedbackAnimationDuration * 2.0 * NSEC_PER_SEC));
+    dispatch_time_t resetTime =
+        dispatch_time(DISPATCH_TIME_NOW, (int64_t)(ClearFeedbackAnimationDuration * 2.0 * NSEC_PER_SEC));
     dispatch_after(resetTime, dispatch_get_main_queue(), ^{
         completion();
     });

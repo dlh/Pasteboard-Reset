@@ -6,17 +6,14 @@
 
 #import <Carbon/Carbon.h>
 
-static const NSEventModifierFlags RequiredModifierMask = NSEventModifierFlagCommand |
-                                                          NSEventModifierFlagOption |
-                                                          NSEventModifierFlagControl;
-static const NSEventModifierFlags RecordedModifierMask = NSEventModifierFlagCommand |
-                                                          NSEventModifierFlagOption |
-                                                          NSEventModifierFlagControl |
-                                                          NSEventModifierFlagShift;
+static const NSEventModifierFlags RequiredModifierMask =
+    NSEventModifierFlagCommand | NSEventModifierFlagOption | NSEventModifierFlagControl;
+static const NSEventModifierFlags RecordedModifierMask =
+    NSEventModifierFlagCommand | NSEventModifierFlagOption | NSEventModifierFlagControl | NSEventModifierFlagShift;
 static const CGFloat CornerRadius = 5.0;
 static const CGFloat ClearButtonSize = 14.0;
 static const CGFloat ClearButtonMargin = 6.0;
-static NSString * const ShortcutRecorderAccessibilityIdentifier = @"ClearPasteboardShortcutRecorder";
+static NSString *const ShortcutRecorderAccessibilityIdentifier = @"ClearPasteboardShortcutRecorder";
 
 // Plain NSButtons are excluded from the Tab order unless Full Keyboard Access is on;
 // override to make the clear button reachable regardless, matching ShortcutRecorderControl itself.
@@ -74,7 +71,7 @@ static NSString * const ShortcutRecorderAccessibilityIdentifier = @"ClearPastebo
 - (void)configureClearButton
 {
     NSImage *clearImage = [NSImage imageWithSystemSymbolName:@"xmark.circle.fill"
-                                      accessibilityDescription:NSLocalizedString(@"Clear Shortcut", nil)];
+                                    accessibilityDescription:NSLocalizedString(@"Clear Shortcut", nil)];
     NSButton *button = [ShortcutClearButton buttonWithImage:clearImage target:self action:@selector(clearShortcut:)];
     button.bezelStyle = NSBezelStyleInline;
     button.bordered = NO;
@@ -105,9 +102,9 @@ static NSString * const ShortcutRecorderAccessibilityIdentifier = @"ClearPastebo
 
 - (void)layoutClearButton
 {
-    _clearButton.frame = NSMakeRect(self.bounds.size.width - ClearButtonSize - ClearButtonMargin,
-                                     (self.bounds.size.height - ClearButtonSize) / 2.0,
-                                     ClearButtonSize, ClearButtonSize);
+    _clearButton.frame =
+        NSMakeRect(self.bounds.size.width - ClearButtonSize - ClearButtonMargin,
+                   (self.bounds.size.height - ClearButtonSize) / 2.0, ClearButtonSize, ClearButtonSize);
 }
 
 - (BOOL)acceptsFirstResponder
@@ -251,14 +248,14 @@ static NSString * const ShortcutRecorderAccessibilityIdentifier = @"ClearPastebo
 
     NSColor *textColor = self.isRecording ? NSColor.alternateSelectedControlTextColor : NSColor.controlTextColor;
     NSDictionary *attributes = @{
-        NSFontAttributeName: [NSFont systemFontOfSize:NSFont.systemFontSize],
-        NSForegroundColorAttributeName: textColor,
+        NSFontAttributeName : [NSFont systemFontOfSize:NSFont.systemFontSize],
+        NSForegroundColorAttributeName : textColor,
     };
     NSString *string = [self displayString];
     NSSize stringSize = [string sizeWithAttributes:attributes];
-    NSRect textRect = NSMakeRect((self.bounds.size.width - stringSize.width) / 2.0,
-                                  (self.bounds.size.height - stringSize.height) / 2.0,
-                                  stringSize.width, stringSize.height);
+    NSRect textRect =
+        NSMakeRect((self.bounds.size.width - stringSize.width) / 2.0,
+                   (self.bounds.size.height - stringSize.height) / 2.0, stringSize.width, stringSize.height);
     [string drawInRect:textRect withAttributes:attributes];
 }
 
@@ -287,16 +284,21 @@ static NSString * const ShortcutRecorderAccessibilityIdentifier = @"ClearPastebo
 
 + (NSString *)stringForKeyCode:(NSInteger)keyCode modifierFlags:(NSEventModifierFlags)modifierFlags
 {
-    return [NSString stringWithFormat:@"%@%@", [self stringForModifierFlags:modifierFlags], [self stringForKeyCode:keyCode]];
+    return [NSString
+        stringWithFormat:@"%@%@", [self stringForModifierFlags:modifierFlags], [self stringForKeyCode:keyCode]];
 }
 
 + (NSString *)stringForModifierFlags:(NSEventModifierFlags)modifierFlags
 {
     NSMutableString *string = [NSMutableString string];
-    if (modifierFlags & NSEventModifierFlagControl) [string appendString:@"⌃"];
-    if (modifierFlags & NSEventModifierFlagOption) [string appendString:@"⌥"];
-    if (modifierFlags & NSEventModifierFlagShift) [string appendString:@"⇧"];
-    if (modifierFlags & NSEventModifierFlagCommand) [string appendString:@"⌘"];
+    if (modifierFlags & NSEventModifierFlagControl)
+        [string appendString:@"⌃"];
+    if (modifierFlags & NSEventModifierFlagOption)
+        [string appendString:@"⌥"];
+    if (modifierFlags & NSEventModifierFlagShift)
+        [string appendString:@"⇧"];
+    if (modifierFlags & NSEventModifierFlagCommand)
+        [string appendString:@"⌘"];
     return string;
 }
 
@@ -306,23 +308,32 @@ static NSString * const ShortcutRecorderAccessibilityIdentifier = @"ClearPastebo
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         specialKeys = @{
-            @(kVK_Return): @"⏎",
-            @(kVK_Tab): @"⇥",
-            @(kVK_Space): NSLocalizedString(@"Space", nil),
-            @(kVK_Delete): @"⌫",
-            @(kVK_ForwardDelete): @"⌦",
-            @(kVK_Escape): @"⎋",
-            @(kVK_LeftArrow): @"←",
-            @(kVK_RightArrow): @"→",
-            @(kVK_UpArrow): @"↑",
-            @(kVK_DownArrow): @"↓",
-            @(kVK_Home): @"↖",
-            @(kVK_End): @"↘",
-            @(kVK_PageUp): @"⇞",
-            @(kVK_PageDown): @"⇟",
-            @(kVK_F1): @"F1", @(kVK_F2): @"F2", @(kVK_F3): @"F3", @(kVK_F4): @"F4",
-            @(kVK_F5): @"F5", @(kVK_F6): @"F6", @(kVK_F7): @"F7", @(kVK_F8): @"F8",
-            @(kVK_F9): @"F9", @(kVK_F10): @"F10", @(kVK_F11): @"F11", @(kVK_F12): @"F12",
+            @(kVK_Return) : @"⏎",
+            @(kVK_Tab) : @"⇥",
+            @(kVK_Space) : NSLocalizedString(@"Space", nil),
+            @(kVK_Delete) : @"⌫",
+            @(kVK_ForwardDelete) : @"⌦",
+            @(kVK_Escape) : @"⎋",
+            @(kVK_LeftArrow) : @"←",
+            @(kVK_RightArrow) : @"→",
+            @(kVK_UpArrow) : @"↑",
+            @(kVK_DownArrow) : @"↓",
+            @(kVK_Home) : @"↖",
+            @(kVK_End) : @"↘",
+            @(kVK_PageUp) : @"⇞",
+            @(kVK_PageDown) : @"⇟",
+            @(kVK_F1) : @"F1",
+            @(kVK_F2) : @"F2",
+            @(kVK_F3) : @"F3",
+            @(kVK_F4) : @"F4",
+            @(kVK_F5) : @"F5",
+            @(kVK_F6) : @"F6",
+            @(kVK_F7) : @"F7",
+            @(kVK_F8) : @"F8",
+            @(kVK_F9) : @"F9",
+            @(kVK_F10) : @"F10",
+            @(kVK_F11) : @"F11",
+            @(kVK_F12) : @"F12",
         };
     });
 
@@ -355,9 +366,9 @@ static NSString * const ShortcutRecorderAccessibilityIdentifier = @"ClearPastebo
     UInt32 deadKeyState = 0;
     UniChar characters[4];
     UniCharCount length = 0;
-    OSStatus status = UCKeyTranslate(layout, keyCode, kUCKeyActionDisplay, 0, LMGetKbdType(),
-                                      kUCKeyTranslateNoDeadKeysBit, &deadKeyState,
-                                      sizeof(characters) / sizeof(UniChar), &length, characters);
+    OSStatus status =
+        UCKeyTranslate(layout, keyCode, kUCKeyActionDisplay, 0, LMGetKbdType(), kUCKeyTranslateNoDeadKeysBit,
+                       &deadKeyState, sizeof(characters) / sizeof(UniChar), &length, characters);
     CFRelease(inputSource);
 
     if (status != noErr || length == 0)
