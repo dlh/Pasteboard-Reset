@@ -142,7 +142,7 @@
     [menu addItem:[NSMenuItem separatorItem]];
     [menu addItemWithTitle:NSLocalizedString(@"Settings…", nil)
                     action:@selector(showSettings:)
-             keyEquivalent:@""].target = self;
+             keyEquivalent:@","].target = self;
     [menu addItem:[NSMenuItem separatorItem]];
     [menu addItemWithTitle:[NSString stringWithFormat:NSLocalizedString(@"Quit %@", nil), self.applicationName]
                     action:@selector(terminate:)
