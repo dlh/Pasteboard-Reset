@@ -13,6 +13,13 @@ number of commits on the current branch. You can override both values:
 make release VERSION=1.2.3 BUILD_NUMBER=42
 ```
 
+If you add or remove an `NSLocalizedString` call, keep
+`Resources/en.lproj/Localizable.strings` in sync and verify it with:
+
+```sh
+make check-strings
+```
+
 Preview the next semantic-release version and release notes with:
 
 ```sh

@@ -67,7 +67,7 @@ else
 $(error CONFIGURATION must be debug or release)
 endif
 
-.PHONY: all debug release build prepare-build run sign archive notarize staple semantic-release-prepare release-dry-run version clean icon pngcrush
+.PHONY: all debug release build prepare-build run sign archive notarize staple semantic-release-prepare release-dry-run version clean icon pngcrush check-strings
 
 all: release
 
@@ -203,3 +203,8 @@ icon:
 
 pngcrush:
 	@for f in $(shell find Resources -name '*.png'); do pngcrush -ow -l 9 $$f; done
+
+check-strings:
+	@$(PYTHON) bin/check_localizable_strings.py \
+		--sources-dir Sources \
+		--strings-file Resources/en.lproj/Localizable.strings
