@@ -1,4 +1,6 @@
-"About %@" = "About %@";
+"About" = "About";
+"Automatically start when you log in." = "Automatically start when you log in.";
+"Briefly pulse the menu bar icon when the pasteboard is cleared." = "Briefly pulse the menu bar icon when the pasteboard is cleared.";
 "Clear Animation" = "Clear Animation";
 "Click to Record Shortcut" = "Click to Record Shortcut";
 "Clear Pasteboard" = "Clear Pasteboard";
@@ -8,14 +10,16 @@
 "Close" = "Close";
 "Could Not Set Shortcut" = "Could Not Set Shortcut";
 "Could Not Update Launch at Login" = "Could Not Update Launch at Login";
+"GitHub Project" = "GitHub Project";
 "Launch at Login" = "Launch at Login";
 "Launch at Login (Requires Approval)" = "Launch at Login (Requires Approval)";
 "OK" = "OK";
 "Press ⎋ to cancel or ⌫ to clear." = "Press ⎋ to cancel or ⌫ to clear.";
 "Quit %@" = "Quit %@";
+"Settings" = "Settings";
 "Settings…" = "Settings…";
-"%@ Settings" = "%@ Settings";
 "Space" = "Space";
 "That key combination is already in use by the system or another app." = "That key combination is already in use by the system or another app.";
 "The login item setting could not be changed." = "The login item setting could not be changed.";
 "Type Shortcut" = "Type Shortcut";
+"Version %@ (%@)" = "Version %@ (%@)";

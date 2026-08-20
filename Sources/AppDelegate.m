@@ -100,12 +100,6 @@
     return event.type == NSEventTypeRightMouseDown || (event.modifierFlags & interestingFlags) != 0;
 }
 
-- (void)showAbout:(id)sender
-{
-    [NSApp activateIgnoringOtherApps:YES];
-    [NSApp orderFrontStandardAboutPanel:sender];
-}
-
 - (void)handleClearAnimationChange:(BOOL)enabled
 {
     if (!enabled)
@@ -136,10 +130,6 @@
 {
     NSMenu *menu = [[NSMenu alloc] init];
     menu.delegate = self;
-    [menu addItemWithTitle:[NSString stringWithFormat:NSLocalizedString(@"About %@", nil), self.applicationName]
-                    action:@selector(showAbout:)
-             keyEquivalent:@""].target = self;
-    [menu addItem:[NSMenuItem separatorItem]];
     [menu addItemWithTitle:NSLocalizedString(@"Settings…", nil)
                     action:@selector(showSettings:)
              keyEquivalent:@","].target = self;
