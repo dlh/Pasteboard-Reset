@@ -146,7 +146,7 @@
     [menu addItem:[NSMenuItem separatorItem]];
     [menu addItemWithTitle:[NSString stringWithFormat:NSLocalizedString(@"Quit %@", nil), self.applicationName]
                     action:@selector(terminate:)
-             keyEquivalent:@""].target = NSApp;
+             keyEquivalent:@"q"].target = NSApp;
     return menu;
 }
 
