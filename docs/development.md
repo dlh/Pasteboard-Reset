@@ -33,6 +33,13 @@ Or check formatting without modifying files:
 make format-check
 ```
 
+Pure reformatting commits are listed in `.git-blame-ignore-revs` so they don't
+obscure `git blame`. Configure your local clone to use it:
+
+```sh
+git config blame.ignoreRevsFile .git-blame-ignore-revs
+```
+
 Preview the next semantic-release version and release notes with:
 
 ```sh
