@@ -41,6 +41,7 @@ PLIST_DEPS := $(INFO_PLIST) $(VERSION_FILE)
 
 SDKROOT := $(shell xcrun --sdk macosx --show-sdk-path)
 CLANG := xcrun clang
+CLANG_FORMAT := xcrun clang-format
 CODESIGN := codesign
 DITTO := ditto
 NOTARYTOOL := xcrun notarytool
@@ -67,7 +68,7 @@ else
 $(error CONFIGURATION must be debug or release)
 endif
 
-.PHONY: all debug release build prepare-build run sign archive notarize staple semantic-release-prepare release-dry-run version clean icon pngcrush check-strings
+.PHONY: all debug release build prepare-build run sign archive notarize staple semantic-release-prepare release-dry-run version clean icon pngcrush check-strings format format-check
 
 all: release
 
@@ -208,3 +209,9 @@ check-strings:
 	@$(PYTHON) bin/check_localizable_strings.py \
 		--sources-dir Sources \
 		--strings-file Resources/en.lproj/Localizable.strings
+
+format:
+	$(CLANG_FORMAT) -i Sources/*.h Sources/*.m
+
+format-check:
+	$(CLANG_FORMAT) --dry-run --Werror Sources/*.h Sources/*.m

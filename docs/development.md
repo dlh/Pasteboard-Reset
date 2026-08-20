@@ -20,6 +20,19 @@ If you add or remove an `NSLocalizedString` call, keep
 make check-strings
 ```
 
+Source files are formatted with `clang-format` using the repo's `.clang-format`
+config. Format in place with:
+
+```sh
+make format
+```
+
+Or check formatting without modifying files:
+
+```sh
+make format-check
+```
+
 Preview the next semantic-release version and release notes with:
 
 ```sh
