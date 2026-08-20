@@ -1,6 +1,19 @@
 Pasteboard Reset Changelog
 =========================
 
+# [1.6.0](https://github.com/dlh/Pasteboard-Reset/compare/v1.5.0...v1.6.0) (2026-08-20)
+
+
+### Bug Fixes
+
+* add ⌘-, shortcut to open Settings ([0cab243](https://github.com/dlh/Pasteboard-Reset/commit/0cab243201e19a627a6c511801376ca88c91a1e3))
+* add ⌘-Q shortcut to Quit ([ba75d6b](https://github.com/dlh/Pasteboard-Reset/commit/ba75d6beda179c13e3800526ad176c7629c42931))
+
+
+### Features
+
+* move About panel into Settings window as a tab ([a08ec06](https://github.com/dlh/Pasteboard-Reset/commit/a08ec061aec21dbeab312ef9cc35941de0776e45))
+
 # [1.5.0](https://github.com/dlh/Pasteboard-Reset/compare/v1.4.1...v1.5.0) (2026-08-19)
 
 
