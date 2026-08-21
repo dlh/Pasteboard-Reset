@@ -38,6 +38,7 @@ OBJECTS := $(SOURCES:Sources/%.m=$(OBJ_DIR)/%.o)
 DEPFILES := $(OBJECTS:.o=.d)
 INFO_PLIST := Sources/Info.plist
 PLIST_DEPS := $(INFO_PLIST) $(VERSION_FILE)
+STRINGS_FILE := Resources/en.lproj/Localizable.strings
 
 SDKROOT := $(shell xcrun --sdk macosx --show-sdk-path)
 CLANG := xcrun clang
@@ -68,7 +69,7 @@ else
 $(error CONFIGURATION must be debug or release)
 endif
 
-.PHONY: all debug release build prepare-build run sign archive notarize staple semantic-release-prepare release-dry-run version clean icon pngcrush check-strings format format-check
+.PHONY: all debug release build prepare-build run sign archive notarize staple semantic-release-prepare release-dry-run version clean icon pngcrush check-strings format format-check git-install-hooks
 
 all: release
 
@@ -208,10 +209,13 @@ pngcrush:
 check-strings:
 	@$(PYTHON) bin/check_localizable_strings.py \
 		--sources-dir Sources \
-		--strings-file Resources/en.lproj/Localizable.strings
+		--strings-file $(STRINGS_FILE)
 
 format:
 	$(CLANG_FORMAT) -i Sources/*.h Sources/*.m
 
 format-check:
 	$(CLANG_FORMAT) --dry-run --Werror Sources/*.h Sources/*.m
+
+git-install-hooks:
+	git config core.hooksPath .githooks

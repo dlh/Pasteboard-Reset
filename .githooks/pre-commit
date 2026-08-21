@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+mapfile -d '' -t source_files < <(git diff --cached --name-only --diff-filter=ACM -z -- '*.h' '*.m')
+
+if [ ${#source_files[@]} -gt 0 ]; then
+  xcrun clang-format -i "${source_files[@]}"
+  git add "${source_files[@]}"
+fi
+
+make check-strings >/dev/null

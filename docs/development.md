@@ -33,6 +33,13 @@ Or check formatting without modifying files:
 make format-check
 ```
 
+A pre-commit hook can format staged sources and run `check-strings`
+automatically. Install it once per clone with:
+
+```sh
+make git-install-hooks
+```
+
 Pure reformatting commits are listed in `.git-blame-ignore-revs` so they don't
 obscure `git blame`. Configure your local clone to use it:
 
