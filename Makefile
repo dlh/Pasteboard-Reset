@@ -69,7 +69,27 @@ else
 $(error CONFIGURATION must be debug or release)
 endif
 
-.PHONY: all debug release build prepare-build run sign archive notarize staple semantic-release-prepare release-dry-run version clean icon pngcrush check-strings format format-check git-install-hooks
+.PHONY: \
+	all \
+	archive \
+	build \
+	check-strings \
+	clean \
+	debug \
+	format \
+	format-check \
+	git-install-hooks \
+	icon \
+	notarize \
+	pngcrush \
+	prepare-build \
+	release \
+	release-dry-run \
+	run \
+	semantic-release-prepare \
+	sign \
+	staple \
+	version
 
 all: release
 
