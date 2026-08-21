@@ -1,2 +1,5 @@
 # style: apply clang-format
 769200a27a91bd8097297943c4b02ba119f745c3
+
+# style: clean up make phony targets
+17addf32959d9b3a44fd1aa4a68a6bb04ae21a84
