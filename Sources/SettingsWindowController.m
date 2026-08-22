@@ -131,7 +131,11 @@ static NSString *const GitHubProjectURLString = @"https://github.com/dlh/Pastebo
 
 - (void)selectToolbarItem:(NSToolbarItem *)sender
 {
-    NSToolbarItemIdentifier identifier = sender.itemIdentifier;
+    [self selectTabViewItemWithIdentifier:sender.itemIdentifier];
+}
+
+- (void)selectTabViewItemWithIdentifier:(NSToolbarItemIdentifier)identifier
+{
     [_tabView selectTabViewItemWithIdentifier:identifier];
     self.window.toolbar.selectedItemIdentifier = identifier;
 }
@@ -331,6 +335,12 @@ static NSString *const GitHubProjectURLString = @"https://github.com/dlh/Pastebo
 - (void)showWindow:(id)sender
 {
     [NSApp activateIgnoringOtherApps:YES];
+
+    // The window controller (and its toolbar/tab view) outlives each
+    // show/close cycle, so the previously selected tab would otherwise
+    // still be showing; always come back to Settings.
+    [self selectTabViewItemWithIdentifier:SettingsToolbarItemIdentifier];
+
     [super showWindow:sender];
 
     // Don't leave a control auto-focused when the window opens.
