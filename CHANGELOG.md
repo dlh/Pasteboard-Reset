@@ -1,6 +1,13 @@
 Pasteboard Reset Changelog
 =========================
 
+## [1.6.1](https://github.com/dlh/Pasteboard-Reset/compare/v1.6.0...v1.6.1) (2026-08-22)
+
+
+### Bug Fixes
+
+* always open Settings window to the Settings tab ([b186fc6](https://github.com/dlh/Pasteboard-Reset/commit/b186fc6a1b006e3a7d3953b7ed31a61ca0bf4acf))
+
 # [1.6.0](https://github.com/dlh/Pasteboard-Reset/compare/v1.5.0...v1.6.0) (2026-08-20)
 
 
