@@ -32,7 +32,16 @@ PLIST_SETTINGS_FILE := $(BUILD_DIR)/.plist.settings
 CONFIGURATION_FILE := $(BUILD_DIR)/.configuration
 SIGN_IDENTITY_FILE := $(BUILD_DIR)/.sign.identity
 
-SOURCES := Sources/main.m Sources/AppDelegate.m Sources/GlobalHotKeyController.m Sources/LaunchAtLoginController.m Sources/SettingsController.m Sources/SettingsWindowController.m Sources/ShortcutRecorderControl.m Sources/StatusItemButton.m Sources/StatusItemIcon.m
+SOURCES := \
+	Sources/AppDelegate.m \
+	Sources/GlobalHotKeyController.m \
+	Sources/LaunchAtLoginController.m \
+	Sources/main.m \
+	Sources/SettingsController.m \
+	Sources/SettingsWindowController.m \
+	Sources/ShortcutRecorderControl.m \
+	Sources/StatusItemButton.m \
+	Sources/StatusItemIcon.m
 OBJ_DIR := $(BUILD_DIR)/obj/$(CONFIGURATION)
 OBJECTS := $(SOURCES:Sources/%.m=$(OBJ_DIR)/%.o)
 DEPFILES := $(OBJECTS:.o=.d)
