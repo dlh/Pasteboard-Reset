@@ -69,6 +69,10 @@ else
 $(error CONFIGURATION must be debug or release)
 endif
 
+define clear-stamp-if-stale
+@if [ -f "$(1)" ] && { [ ! -f "$(2)" ] || [ "$$(cat "$(2)")" != "$(3)" ]; }; then rm -f $(4); fi
+endef
+
 .PHONY: \
 	all \
 	archive \
@@ -116,15 +120,9 @@ prepare-build:
 		[ ! -f "$(RESOURCES_DIR)/en.lproj/Localizable.strings" ]; then \
 		rm -f "$(STAMP_BINARY)" "$(STAMP_PLIST)" "$(STAMP_ICON)" "$(STAMP_RESOURCES)" "$(STAMP_SIGN)" "$(PLIST_SETTINGS_FILE)" "$(SIGN_IDENTITY_FILE)"; \
 	fi
-	@if [ -f "$(STAMP_SIGN)" ] && { [ ! -f "$(SIGN_IDENTITY_FILE)" ] || [ "$$(cat "$(SIGN_IDENTITY_FILE)")" != "$(SIGN_IDENTITY)" ]; }; then \
-		rm -f "$(STAMP_SIGN)"; \
-	fi
-	@if [ -f "$(STAMP_PLIST)" ] && { [ ! -f "$(PLIST_VERSION_FILE)" ] || [ "$$(cat "$(PLIST_VERSION_FILE)")" != "$(VERSION)|$(BUILD_NUMBER)" ]; }; then \
-		rm -f "$(STAMP_PLIST)" "$(STAMP_SIGN)"; \
-	fi
-	@if [ -f "$(STAMP_PLIST)" ] && { [ ! -f "$(PLIST_SETTINGS_FILE)" ] || [ "$$(cat "$(PLIST_SETTINGS_FILE)")" != "$(EXECUTABLE_NAME)|$(APP_NAME)|$(PRODUCT_BUNDLE_IDENTIFIER)|$(MACOSX_DEPLOYMENT_TARGET)" ]; }; then \
-		rm -f "$(STAMP_PLIST)" "$(STAMP_SIGN)"; \
-	fi
+	$(call clear-stamp-if-stale,$(STAMP_SIGN),$(SIGN_IDENTITY_FILE),$(SIGN_IDENTITY),$(STAMP_SIGN))
+	$(call clear-stamp-if-stale,$(STAMP_PLIST),$(PLIST_VERSION_FILE),$(VERSION)|$(BUILD_NUMBER),$(STAMP_PLIST) $(STAMP_SIGN))
+	$(call clear-stamp-if-stale,$(STAMP_PLIST),$(PLIST_SETTINGS_FILE),$(EXECUTABLE_NAME)|$(APP_NAME)|$(PRODUCT_BUNDLE_IDENTIFIER)|$(MACOSX_DEPLOYMENT_TARGET),$(STAMP_PLIST) $(STAMP_SIGN))
 
 -include $(DEPFILES)
 
